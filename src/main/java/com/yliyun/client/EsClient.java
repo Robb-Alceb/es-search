@@ -12,7 +12,7 @@ import java.net.UnknownHostException;
  */
 public class EsClient {
 
-    private static  String IP = "192.168.0.24";
+    private static  String IP = "localhost";
 
     private static TransportClient esc = null;
 
@@ -44,6 +44,7 @@ public class EsClient {
             e.printStackTrace();
         }
         // .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
+
 
         return client;
 

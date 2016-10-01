@@ -8,9 +8,13 @@ public class EsIndexConfig {
     private String indexName;
     private String typeName;
 
+    public EsIndexConfig(String indexName, String typeName) {
+        this.indexName = indexName.toLowerCase();
+        this.typeName = typeName.toLowerCase();
+    }
 
     public String getIndexName() {
-        return indexName;
+        return indexName.toLowerCase();
     }
 
     public void setIndexName(String indexName) {
@@ -18,7 +22,7 @@ public class EsIndexConfig {
     }
 
     public String getTypeName() {
-        return typeName;
+        return typeName.toLowerCase();
     }
 
     public void setTypeName(String typeName) {
