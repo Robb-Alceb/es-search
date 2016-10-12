@@ -10,6 +10,7 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsAction;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.exists.ExistsAction;
 import org.elasticsearch.action.support.PlainActionFuture;
@@ -65,12 +66,9 @@ public class SetupIndexServiceImpl implements SetupIndexService {
     @Override
     public boolean createIndex(EsIndexConfig config) {
 
-
-
-        Settings settings =Settings.settingsBuilder()
+        Settings settings = Settings.settingsBuilder()
                 .put("index.number_of_shards", "3")
-                .put("index.number_of_replicas","3").build();
-
+                .put("index.number_of_replicas", "3").build();
 
         CreateIndexRequest cir = new CreateIndexRequest(config.getIndexName(), settings);
 
@@ -78,13 +76,10 @@ public class SetupIndexServiceImpl implements SetupIndexService {
 
             CreateIndexResponse ci = tc.admin().indices().prepareCreate(config.getIndexName()).execute().actionGet();
 
-            ci.getContext();
-
-            System.out.println(ci.getContext());
-
             tc.close();
 
             return true;
+            //  System.out.println(ci.getContext());
 
         } catch (Exception ex) {
 
@@ -96,17 +91,19 @@ public class SetupIndexServiceImpl implements SetupIndexService {
     }
 
     @Override
-    public boolean createMapping(EsIndexConfig config) throws IOException {
+    public boolean createMapping(EsIndexConfig config, XContentBuilder mappingBuilder) throws IOException, ExecutionException, InterruptedException {
 
-        XContentBuilder mappingBuilder  =XContentFactory.jsonBuilder()
-                .startObject()
-                    .startObject("properties")
-                        .startObject("id").field("type","string").field("index","not_analyzed").endObject()
-                        .startObject("content").field("type","string").field("analyzer","ik_max_word").endObject()
-                    .endObject()
-                .endObject();
+//        XContentBuilder mappingBuilder = XContentFactory.jsonBuilder()
+//                .startObject()
+//                .startObject("properties")
+//                .startObject("id").field("type", "string").field("index", "not_analyzed").endObject()
+//                .startObject("content").field("type", "string").field("analyzer", "ik_max_word").endObject()
+//                .endObject()
+//                .endObject();
 
-        tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mappingBuilder).execute();
+        ListenableActionFuture<PutMappingResponse>  pb =  tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mappingBuilder).execute();
+
+        System.out.println(pb.get().getContext().toString());
 
         tc.close();
         return false;
@@ -120,9 +117,9 @@ public class SetupIndexServiceImpl implements SetupIndexService {
 //                .startObject("id").field("type","string").field("index","not_analyzed").endObject()
 //                .startObject("content").field("type","string").field("analyzer","ik_max_word").endObject();
 
-       ListenableActionFuture<PutMappingResponse> mappRes=  tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mapping).execute();
+        ListenableActionFuture<PutMappingResponse> mappRes = tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mapping).execute();
         try {
-            PutMappingResponse pmr =  mappRes.get();
+            PutMappingResponse pmr = mappRes.get();
             pmr.getContext();
             System.out.println(pmr.getContext());
         } catch (InterruptedException e) {

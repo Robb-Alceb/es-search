@@ -1,4 +1,4 @@
-package com.yliyun.index;
+package com.yliyun.search;
 
 import com.yliyun.client.EsClient;
 import com.yliyun.model.EsIndexConfig;

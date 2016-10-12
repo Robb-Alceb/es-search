@@ -1,14 +1,20 @@
 package com.yliyun;
 
 import com.yliyun.index.*;
+import com.yliyun.model.DocumentData;
 import com.yliyun.model.EsIndexConfig;
+import com.yliyun.search.ForSearch;
+import com.yliyun.search.ProductQueryService;
+import com.yliyun.search.ProductQueryServiceImpl;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Administrator on 2016/9/29.
@@ -21,7 +27,7 @@ public class SetUpTest {
 
         SetupIndexService sis = new SetupIndexServiceImpl();
 
-        EsIndexConfig eis = new EsIndexConfig("java1Index","javaType");
+        EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
 
         sis.createIndex(eis);
     }
@@ -54,10 +60,17 @@ public class SetUpTest {
         SetupIndexService sis = new SetupIndexServiceImpl();
 
 
-        EsIndexConfig eis = new EsIndexConfig("java1Index","javaType");
+        EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
 
         try {
-            sis.createMapping(eis);
+            try {
+                sis.createMapping(eis, IndexMappingBuild.getDocumentTypeMapping());
+
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,6 +117,22 @@ public class SetUpTest {
         id.indexData(eis,map);
 
     }
+
+    @Test
+    public void indexDataTest2(){
+
+        EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
+
+        DocumentData dd = new DocumentData("123457","歌曲大海-张雨他的.txt",533521,"海边，满满的消失的你，既然非常牛逼，本来模糊的脸，既然渐渐清晰，想要说声爱你",
+                "pdf",new Date(),new Date(),"1","personal",false,"漫步","168891","manbu1","7884","good");
+
+
+        IndexData id = new IndexDateImpl();
+        id.indexData(eis,dd);
+
+    }
+
+
     @Test
     public void searchTest(){
         ForSearch fs = new ForSearch();
@@ -111,6 +140,28 @@ public class SetUpTest {
         EsIndexConfig eis = new EsIndexConfig("java1Index","Type");
 
         fs.dosearch(eis);
+    }
+
+    @Test
+    public void searchTestObj(){
+
+        EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
+
+        ProductQueryService pqs = new ProductQueryServiceImpl() ;
+
+        DocumentData dd =  pqs.getProduct(eis,"12345");
+
+        System.out.println(dd);
+    }
+
+
+    @Test
+    public  void baseSearchTest(){
+        EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
+
+        ProductQueryService pqs = new ProductQueryServiceImpl() ;
+        pqs.baseSearch(eis,"卡夫卡");
+
     }
 
 
