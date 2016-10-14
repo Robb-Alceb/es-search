@@ -7,12 +7,15 @@ import com.yliyun.index.SearchDocumentFieldName;
 import com.yliyun.model.DocumentData;
 import com.yliyun.model.EsIndexConfig;
 import com.yliyun.util.SearchDateUtils;
+import org.apache.lucene.queryparser.xml.FilterBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.index.get.GetField;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 
@@ -52,33 +55,43 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     @Override
     public ProductSearchResult baseSearch(EsIndexConfig config, String keyword) {
 
-        QueryBuilder tqb = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_REAL_NAME.getFieldName(), "manbu1"));
+        QueryBuilder tqb = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_REAL_NAME.getFieldName(), "manbu2"))
+                .must(termQuery(SearchDocumentFieldName.FILE_USER_NAME.getFieldName(), "漫步"));
         QueryBuilder qb = multiMatchQuery(
                 keyword,
                 SearchDocumentFieldName.FILE_TITLE.getFieldName(), SearchDocumentFieldName.FILE_CONTENTS.getFieldName()
         );
 
         SearchResponse sr = tc.prepareSearch(config.getIndexName()).setTypes(config.getTypeName())
-                .setQuery(tqb)
-                .setQuery(qb)
+                .setQuery(qb).setPostFilter( tqb)
                 .execute().actionGet();
 
         System.out.println(sr.getHits().totalHits());
 
         for (SearchHit searchHit : sr.getHits()) {
-            // Product product = new  Product();
+             DocumentData doc = new  DocumentData();
 
             System.out.println(searchHit.getId());
             System.out.println(searchHit.getSourceAsString());
 
 //            product.setId(Long.valueOf(searchHit.getId()));
-//            product.setTitle(getFieldValueOrNull(searchHit, SearchDocumentFieldName.TITLE.getFieldName()));
+//            doc.setFileTitle(getFieldValueOrNull(searchHit, SearchDocumentFieldName.FILE_TITLE.getFieldName());
 //            product.setPrice(BigDecimal.valueOf(getDoubleFieldValueOrNull(searchHit, SearchDocumentFieldName.PRICE.getFieldName())));
 //            product.setSoldOut(Boolean.valueOf(getFieldValueOrNull(searchHit, SearchDocumentFieldName.SOLD_OUT.getFieldName())));
 //
 //            productSearchResult.addProduct(product);
         }
 
+        return null;
+    }
+
+
+    protected String getStringFieldValue(SearchHit field)
+    {
+        if(field !=null)
+        {
+//            return String.valueOf(field.get());
+        }
         return null;
     }
 

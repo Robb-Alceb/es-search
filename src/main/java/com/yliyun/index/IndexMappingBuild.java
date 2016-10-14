@@ -1,6 +1,5 @@
 package com.yliyun.index;
 
-import com.yliyun.model.EsIndexConfig;
 import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;

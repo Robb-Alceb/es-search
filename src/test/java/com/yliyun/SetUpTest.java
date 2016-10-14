@@ -123,8 +123,8 @@ public class SetUpTest {
 
         EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
 
-        DocumentData dd = new DocumentData("123457","歌曲大海-张雨他的.txt",533521,"海边，满满的消失的你，既然非常牛逼，本来模糊的脸，既然渐渐清晰，想要说声爱你",
-                "pdf",new Date(),new Date(),"1","personal",false,"漫步","168891","manbu1","7884","good");
+        DocumentData dd = new DocumentData("123458","我爱祖国天安门.png",533521,"我爱祖国天安门，天安门上太阳升，我们歌唱毛主席",
+                "png",new Date(),new Date(),"1","group",false,"漫步","168891","manbu2","78845","good,bd");
 
 
         IndexData id = new IndexDateImpl();
@@ -160,7 +160,7 @@ public class SetUpTest {
         EsIndexConfig eis = new EsIndexConfig("java2Index","javaType");
 
         ProductQueryService pqs = new ProductQueryServiceImpl() ;
-        pqs.baseSearch(eis,"卡夫卡");
+        pqs.baseSearch(eis,"天安门");
 
     }
 
