@@ -13,20 +13,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.CountDownLatch;
 
-
+@EnableScheduling
 @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
 public class ForesoneApplication {
 
-
-
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ForesoneApplication.class);
-
-
-
 
 
 	public static void main(String[] args) throws InterruptedException {
@@ -34,13 +29,13 @@ public class ForesoneApplication {
 
 //		ctx.getBean(RedisConfig.class);
 
-		StringRedisTemplate template = ctx.getBean(StringRedisTemplate.class);
+//		StringRedisTemplate template = ctx.getBean(StringRedisTemplate.class);
 		//CountDownLatch latch = ctx.getBean(CountDownLatch.class);
 
 		//LOGGER.info("Sending message...");
-		System.out.println("sending msg-------------------------------------------------------------");
-		template.convertAndSend("yliyun.file.upload.after", "Hello from Redis!");
-		template.convertAndSend("yliyun.file.upload.after", "Hello from Redis!-----------");
+//		System.out.println("sending msg-------------------------------------------------------------");
+//		template.convertAndSend("yliyun.file.upload.after", "Hello from Redis!");
+//		template.convertAndSend("yliyun.file.upload.after", "Hello from Redis!-----------");
 
 		//latch.await();
 

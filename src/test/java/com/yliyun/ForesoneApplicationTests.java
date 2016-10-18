@@ -1,5 +1,7 @@
 package com.yliyun;
 
+import com.yliyun.service.dao.FilesService;
+import com.yliyun.util.AppConstants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,13 +23,17 @@ import java.util.Map;
 @SpringBootTest
 public class ForesoneApplicationTests {
 
-	@Autowired
-	@Qualifier("primaryJdbcTemplate")
-	protected JdbcTemplate jdbcTemplate1;
+    @Autowired
+    @Qualifier("primaryJdbcTemplate")
+    protected JdbcTemplate jdbcTemplate1;
 
-	@Autowired
-	@Qualifier("secondaryJdbcTemplate")
-	protected JdbcTemplate jdbcTemplate2;
+    @Autowired
+    @Qualifier("secondaryJdbcTemplate")
+    protected JdbcTemplate jdbcTemplate2;
+
+    @Autowired
+    private FilesService filesService;
+
 
 //	@Before
 //	public void setUp() {
@@ -33,14 +41,32 @@ public class ForesoneApplicationTests {
 //		jdbcTemplate2.update("DELETE  FROM  USER ");
 //	}
 
-	@Test
-	public void test() throws Exception {
+    @Test
+    public void test() throws Exception {
 
-        List<Map<String,Object>> list = jdbcTemplate1.queryForList("select * from group_file");
+        System.out.println(filesService.getNoIndexCount());
 
-		System.out.println( Arrays.asList(list).toString());
+        //  List<Map<String,Object>> list = jdbcTemplate1.queryForList("select * from group_file");
 
-	}
+        //	System.out.println( Arrays.asList(list).toString());
+
+
+    }
+
+    @Test
+    public void testGetFiles(){
+        System.out.println(filesService.getFilesList(AppConstants.TABLE_GROUP_FILE));
+    }
+
+    @Test
+    public  void testDownload(){
+
+        try {
+            filesService.download("http://192.168.0.130/group1/M00/00/0B/wKgAglgAkpeAFhKYAAFA4xm-U2A687.pdf", "test.pdf");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 

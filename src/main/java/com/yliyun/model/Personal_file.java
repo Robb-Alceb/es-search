@@ -23,6 +23,7 @@ public class Personal_file {
   private Long update_user_id;
   private String update_user_name;
   private String update_time;
+  private Long search_status;
 
   public Long getFile_id() {
     return file_id;
@@ -198,5 +199,13 @@ public class Personal_file {
 
   public void setUpdate_time(String update_time) {
     this.update_time = update_time;
+  }
+
+  public Long getSearch_status() {
+    return search_status;
+  }
+
+  public void setSearch_status(Long search_status) {
+    this.search_status = search_status;
   }
 }
