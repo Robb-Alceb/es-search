@@ -4,11 +4,8 @@ package com.yliyun.service.dao;
  * Created by Administrator on 2016/10/14.
  */
 
-import com.yliyun.model.CommonFile;
-import com.yliyun.model.CommonFileMapper;
-import com.yliyun.model.Group_file;
+import com.yliyun.model.*;
 import com.yliyun.util.AppConstants;
-import com.yliyun.util.RedisConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +49,39 @@ public class FileServiceImpl implements FilesService {
     public void download(String url, String fileName) throws IOException {
 
         byte[] fileByte = restTemplate.getForObject(url, byte[].class);
-        Files.write(Paths.get("download/" + fileName), fileByte);
+        Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
 
-        LOGGER.info("FileServiceImpl > download  success !! ","download/" + fileName);
+        LOGGER.info("FileServiceImpl > download  success !! ", "download/" + fileName);
+    }
+
+    @Override
+    public String getDownloadUrl(Long fsId) {
+
+        String sql = "SELECT  * from  WHERE fs_file_id = ? ";
+
+        Fs_file fsList = fileJdbcTemplate.queryForObject(sql, new Object[]{fsId}, Fs_file.class);
+
+        return fsList.getFile_name();
+    }
+
+    @Override
+    public boolean updateFileStatus(CommonFile cf, int result) {
+        String tableName = "personal_file";
+
+        if (cf.getFile_category() == "group") {
+            tableName = "group_file";
+        } else if (cf.getFile_category() == "public") {
+            tableName = "public_file";
+        }
+
+        String sql = "  update  " + tableName + " set   search_status = " + result + " WHERE  file_id = " + cf.getFile_id();
+
+        int re = fileJdbcTemplate.update(sql);
+
+        if (re > 0) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -95,10 +122,21 @@ public class FileServiceImpl implements FilesService {
         return indexCount;
     }
 
+
+    @Override
+    public List<CommonFile> getUpFilesList(String tableName) {
+
+        String sql = "select *  from  " + tableName + "  where search_status > 1 limit  0, 10";
+
+        LOGGER.info("FileServiceImpl > getFilesList  tableName & sql : " + tableName + " & sql : " + sql);
+
+        return fileJdbcTemplate.query(sql, new CommonFileMapper(tableName));
+    }
+
     @Override
     public List<CommonFile> getFilesList(String tableName) {
 
-        String sql = "select *  from  " + tableName + "  where  search_status = 0  limit  0, 10";
+        String sql = "select *  from  " + tableName + "  where  search_status = 0 limit  0, 10";
 
         LOGGER.info("FileServiceImpl > getFilesList  tableName & sql : " + tableName + " & sql : " + sql);
 

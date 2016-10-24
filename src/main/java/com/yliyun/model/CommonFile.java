@@ -23,12 +23,15 @@ public class CommonFile {
     private Long file_version;
     private String file_action;
     private Long del_status;
+
     private Long creater_id;
     private String creater_name;
     private String create_time;
+
     private Long update_user_id;
     private String update_user_name;
     private String update_time;
+
     private Long search_status;
 
 
@@ -40,6 +43,16 @@ public class CommonFile {
     private Long group_id;
 
     private String file_category;
+
+    private String file_contents;
+
+    public String getFile_contents() {
+        return file_contents;
+    }
+
+    public void setFile_contents(String file_contents) {
+        this.file_contents = file_contents;
+    }
 
     public Long getUser_id() {
         return user_id;

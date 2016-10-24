@@ -21,16 +21,7 @@ import java.util.List;
 @Configuration
 public class RestConfig {
     
-    @Value("app.download.host")
-    private String AppHost ;
 
-//    public String getAppHost() {
-//        return AppHost;
-//    }
-//
-//    public void setAppHost(String appHost) {
-//        AppHost = appHost;
-//    }
 
     @Bean
     public RestTemplate restTemplate(List<HttpMessageConverter<?>> messageConverters){
@@ -43,5 +34,6 @@ public class RestConfig {
     public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
         return new ByteArrayHttpMessageConverter();
     }
+
 
 }

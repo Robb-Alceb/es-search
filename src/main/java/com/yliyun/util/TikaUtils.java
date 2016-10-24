@@ -2,6 +2,7 @@ package com.yliyun.util;/**
  * Created by Administrator on 2016/10/14.
  */
 
+import org.apache.cxf.common.i18n.Exception;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -23,9 +24,9 @@ import java.io.*;
 public class TikaUtils {
 
 
-    public String txtParser(String path) throws IOException, TikaException, SAXException {
+    public static String txtParser(String path) throws IOException, TikaException, SAXException {
 
-        BodyContentHandler handler = new BodyContentHandler(1000* 1024*1024);
+        BodyContentHandler handler = new BodyContentHandler(1000 * 1024 * 1024);
         Metadata metadata = new Metadata();
 
         FileInputStream inputstream = new FileInputStream(new File(path));
@@ -55,38 +56,22 @@ public class TikaUtils {
      * @param f
      * @return
      */
-    public String fileToTxt(File f) {
+    public static String fileToTxt(File f) throws Exception, IOException, TikaException, SAXException {
         Parser parser = new AutoDetectParser();//自动检测文档类型，自动创建相应的解析器
         InputStream is = null;
-        try {
-            Metadata metadata = new Metadata();
-            //   metadata.set(Metadata.AUTHOR, "空号");//重新设置文档的媒体内容
-            //  metadata.set(Metadata.RESOURCE_NAME_KEY, f.getName());
-            is = new FileInputStream(f);
-            BodyContentHandler handler = new BodyContentHandler();
-            ParseContext context = new ParseContext();
-            context.set(Parser.class, parser);
-            parser.parse(is, handler, metadata, context);
-            for (String name : metadata.names()) {
-                System.out.println(name + ":" + metadata.get(name));
-            }
-            return handler.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (TikaException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (is != null) is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        Metadata metadata = new Metadata();
+        //   metadata.set(Metadata.AUTHOR, "空号");//重新设置文档的媒体内容
+        //  metadata.set(Metadata.RESOURCE_NAME_KEY, f.getName());
+        is = new FileInputStream(f);
+        BodyContentHandler handler = new BodyContentHandler();
+        ParseContext context = new ParseContext();
+        context.set(Parser.class, parser);
+        parser.parse(is, handler, metadata, context);
+        for (String name : metadata.names()) {
+            System.out.println(name + ":" + metadata.get(name));
         }
-        return null;
+        if (is != null) is.close();
+        return handler.toString();
     }
 
 

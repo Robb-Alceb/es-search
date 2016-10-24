@@ -1,18 +1,19 @@
 package com.yliyun.index;
 
-import com.yliyun.client.EsClient;
-import com.yliyun.model.DocumentData;
-import com.yliyun.model.EsIndexConfig;
-import com.yliyun.util.SearchDateUtils;
+import com.yliyun.model.CommonFile;
+import com.yliyun.util.AppConfig;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,37 +25,54 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 /**
  * Created by Administrator on 2016/9/30.
  */
-public class IndexDateImpl implements IndexData {
 
-    TransportClient tc = EsClient.getInstance();
+@Service
+public class IndexDateImpl implements IndexDataService {
+
+    @Autowired
+    private AppConfig ac;
+
+
+    TransportClient tc = AppConfig.EsClient.getInstance();
 
 
     private static final Logger logger = LoggerFactory.getLogger(IndexDateImpl.class);
 
     @Override
-    public void indexData(EsIndexConfig config, DocumentData doc) {
+    public boolean indexData(CommonFile doc) {
 
         try {
-            getIndexRequestBuilderForAProduct(doc, config).get();
+            IndexResponse ir = getIndexRequestBuilderForAProduct(doc).get();
+
+            // System.out.println( ir.getContext().toString());
+
+            logger.info("IndexDateImpl  --->  indexData ---> result : ", ir.getContext());
+
             tc.close();
+
+            return true;
         } catch (Exception ex) {
             logger.error("Error occurred while creating index document for product.", ex);
-            throw new RuntimeException(ex);
+            // throw new RuntimeException(ex);
+            ex.printStackTrace();
         }
+        return false;
 
     }
 
-    private IndexRequestBuilder getIndexRequestBuilderForAProduct(DocumentData doc, EsIndexConfig config) {
+    private IndexRequestBuilder getIndexRequestBuilderForAProduct(CommonFile doc) {
 
         XContentBuilder contentBuilder = null;
+
         try {
+
             contentBuilder = getXContentBuilderForAProduct(doc);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        IndexRequestBuilder indexRequestBuilder = tc.prepareIndex(config.getIndexName(), config.getTypeName(),String.valueOf(doc.getFileId()));
+        IndexRequestBuilder indexRequestBuilder = tc.prepareIndex(ac.getIndexName(), ac.getTypeName(), String.valueOf(doc.getFile_id()));
 
         indexRequestBuilder.setSource(contentBuilder);
 
@@ -62,26 +80,33 @@ public class IndexDateImpl implements IndexData {
 
     }
 
-    private XContentBuilder getXContentBuilderForAProduct(DocumentData doc) throws IOException {
+    private XContentBuilder getXContentBuilderForAProduct(CommonFile doc) throws IOException {
 
         XContentBuilder contentBuilder = null;
         try {
             contentBuilder = jsonBuilder().prettyPrint().startObject();
 
-            contentBuilder.field(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(), doc.getFileCategory())
-                    .field(SearchDocumentFieldName.FILE_STATUS.getFieldName(), doc.getFileStatus())
-                    .field(SearchDocumentFieldName.FILE_USER_NAME.getFieldName(), doc.getUserName())
-                    .field(SearchDocumentFieldName.FILE_IS_FOLDER.getFieldName(), doc.isFileIsFolder())
-                    .field(SearchDocumentFieldName.FILE_CREATE_TIME.getFieldName(), SearchDateUtils.formatDate(doc.getCreateTime()))
-                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), SearchDateUtils.formatDate(doc.getUpdateTime()))
-                    .field(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName(), doc.getGroupId())
-                    .field(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), doc.getGroupId())
-                    .field(SearchDocumentFieldName.FILE_ID.getFieldName(), doc.getGroupId())
-                    .field(SearchDocumentFieldName.FILE_REAL_NAME.getFieldName(), doc.getRealName())
-                    .field(SearchDocumentFieldName.FILE_SIZE.getFieldName(), doc.getFileSize())
-                    .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), doc.getFileContents())
-                    .field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), doc.getFileTitle())
-                    .field(SearchDocumentFieldName.FILE_USER_ID.getFieldName(), doc.getUserId())
+            contentBuilder.field(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(), doc.getFile_category())
+                    .field(SearchDocumentFieldName.FILE_STATUS.getFieldName(), doc.getDel_status())
+
+                    .field(SearchDocumentFieldName.FILE_CREATER_USER_ID.getFieldName(), doc.getCreater_id())
+                    .field(SearchDocumentFieldName.FILE_CREATER_USER_NAME.getFieldName(), doc.getCreater_name())
+                    .field(SearchDocumentFieldName.FILE_CREATE_TIME.getFieldName(), doc.getCreate_time())
+
+                    .field(SearchDocumentFieldName.FILE_IS_FOLDER.getFieldName(), doc.getFolder())
+                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), doc.getUpdate_time())
+                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_ID.getFieldName(), doc.getUpdate_user_id())
+                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), doc.getUpdate_user_name())
+
+                    .field(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName(), doc.getGroup_id())
+                    .field(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), doc.getDoc_type())
+                    .field(SearchDocumentFieldName.FILE_ID.getFieldName(), doc.getFile_id())
+                    .field(SearchDocumentFieldName.FILE_SIZE.getFieldName(), doc.getFile_size())
+
+                    .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), doc.getFile_contents())
+
+                    .field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), doc.getFile_name())
+                    .field(SearchDocumentFieldName.FILE_USER_ID.getFieldName(), doc.getUser_id())
             ;
 
             contentBuilder.endObject();
@@ -96,29 +121,29 @@ public class IndexDateImpl implements IndexData {
 
 
     @Override
-    public void indexData(EsIndexConfig config, Map<String, Object> mapping) {
+    public void indexData(Map<String, Object> mapping) {
 
         // tc.prepareIndex().setSource();
-        tc.prepareIndex(config.getIndexName(), config.getTypeName()).setSource(mapping).get();
+        tc.prepareIndex(ac.getIndexName(), ac.getTypeName()).setSource(mapping).get();
 
 
     }
 
     @Override
-    public void indexBulkData(EsIndexConfig config, List<DocumentData> docs) {
-        if(docs.isEmpty()){
-            return ;
+    public void indexBulkData(List<CommonFile> docs) {
+
+        if (docs.isEmpty()) {
+            return;
         }
+
+
         List<IndexRequestBuilder> requests = new ArrayList<IndexRequestBuilder>();
 
-        for (DocumentData doc : docs)
-        {
-            try
-            {
-                requests.add(getIndexRequestBuilderForAProduct(doc, config));
-            } catch (Exception ex)
-            {
-                logger.error("Error occurred while creating index document for doc with id: " + doc.getFileId() + ", moving to next doc!", ex);
+        for (CommonFile doc : docs) {
+            try {
+                requests.add(getIndexRequestBuilderForAProduct(doc));
+            } catch (Exception ex) {
+                logger.error("Error occurred while creating index document for doc with id: " + doc.getFile_id() + ", moving to next doc!", ex);
             }
         }
 
@@ -127,42 +152,46 @@ public class IndexDateImpl implements IndexData {
     }
 
     @Override
-    public boolean isDocExists(EsIndexConfig config, String fileId) {
+    public boolean isDocExists(Long fileId) {
 
-        return tc.prepareGet().setIndex(config.getIndexName()).setId(String.valueOf(fileId)).get().isExists();
+
+        boolean l = tc.prepareGet().setIndex(ac.getIndexName()).setId(String.valueOf(fileId)).get().isExists();
+
+        tc.close();
+
+        return l;
     }
 
 
     @Override
-    public void updateData(EsIndexConfig config, Map<String, Object> map) {
+    public void updateData(Map<String, Object> map) {
+
 
         UpdateRequest ur = new UpdateRequest();
-        ur.index(config.getIndexName());
-        ur.type(config.getTypeName());
+        ur.index(ac.getIndexName());
+        ur.type(ac.getTypeName());
         ur.id(map.get("_id").toString());
         ur.doc(map);
         tc.update(ur).actionGet();
     }
 
     @Override
-    public void delData(EsIndexConfig config, String id) {
+    public void delData(Long id) {
 
-        DeleteResponse response = tc.prepareDelete(config.getIndexName(), config.getTypeName(), id).get();
 
-        System.out.println("del doc data: "+response.getContext().toString());
+        DeleteResponse response = tc.prepareDelete(ac.getIndexName(), ac.getTypeName(), id + "").get();
 
-        logger.debug("del doc data: "+response.getContext().toString());
+        System.out.println("del doc data: " + response.getContext().toString());
+
+        logger.debug("del doc data: " + response.getContext().toString());
     }
 
 
-    protected BulkResponse processBulkRequests(List<IndexRequestBuilder> requests)
-    {
-        if (requests.size() > 0)
-        {
+    protected BulkResponse processBulkRequests(List<IndexRequestBuilder> requests) {
+        if (requests.size() > 0) {
             BulkRequestBuilder bulkRequest = tc.prepareBulk();
 
-            for (IndexRequestBuilder indexRequestBuilder : requests)
-            {
+            for (IndexRequestBuilder indexRequestBuilder : requests) {
                 bulkRequest.add(indexRequestBuilder);
             }
 
@@ -170,16 +199,13 @@ public class IndexDateImpl implements IndexData {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
 
             logger.debug("Bulk operation data index response total items is:" + bulkResponse.getItems().length);
-            if (bulkResponse.hasFailures())
-            {
+            if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item
                 logger.error("bulk operation indexing has failures:" + bulkResponse.buildFailureMessage());
             }
             tc.close();
             return bulkResponse;
-        }
-        else
-        {
+        } else {
             logger.debug("Executing bulk index request for size: 0");
             return null;
         }

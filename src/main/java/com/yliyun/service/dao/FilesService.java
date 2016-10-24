@@ -22,9 +22,15 @@ public interface FilesService {
 
     List<CommonFile> getFilesList(String fileCategory);
 
-    int [] batchUpdate(List<Long> ids, String tableName);
+    List<CommonFile> getUpFilesList(String fileCategory);
 
-    void download(String url,String writeName) throws IOException;
+    int[] batchUpdate(List<Long> ids, String tableName);
+
+    void download(String url, String writeName) throws IOException;
+
+    String getDownloadUrl(Long fsId);
+
+    boolean updateFileStatus(CommonFile cf, int result);
 
 
 }

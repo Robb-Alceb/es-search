@@ -1,25 +1,22 @@
-package com.yliyun.search;/**
+package com.yliyun.search;
+/**
  * Created by Administrator on 2016/10/11.
  */
 
-import com.yliyun.client.EsClient;
 import com.yliyun.index.SearchDocumentFieldName;
 import com.yliyun.model.DocumentData;
-import com.yliyun.model.EsIndexConfig;
+import com.yliyun.util.AppConfig;
 import com.yliyun.util.SearchDateUtils;
-import org.apache.lucene.queryparser.xml.FilterBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.get.GetField;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -30,13 +27,17 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  * Date : 2016/10/11 - 15:29
  *
  */
+@Service
 public class ProductQueryServiceImpl implements ProductQueryService {
+    
+    @Autowired
+    private AppConfig ac;
 
-    TransportClient tc = EsClient.getInstance();
+    TransportClient tc = AppConfig.EsClient.getInstance();
 
 
     @Override
-    public ProductSearchResult searchProducts(EsIndexConfig config, SearchCriteria searchCriteria) {
+    public ProductSearchResult searchProducts( SearchCriteria searchCriteria) {
 
         SearchRequestBuilder searchBuild = getSearchRequestBuilder(searchCriteria);
 
@@ -53,16 +54,16 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public ProductSearchResult baseSearch(EsIndexConfig config, String keyword) {
+    public ProductSearchResult baseSearch( String keyword) {
 
-        QueryBuilder tqb = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_REAL_NAME.getFieldName(), "manbu2"))
-                .must(termQuery(SearchDocumentFieldName.FILE_USER_NAME.getFieldName(), "漫步"));
+        QueryBuilder tqb = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_CREATER_USER_NAME.getFieldName(), "manbu2"))
+                .must(termQuery(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), "漫步"));
         QueryBuilder qb = multiMatchQuery(
                 keyword,
                 SearchDocumentFieldName.FILE_TITLE.getFieldName(), SearchDocumentFieldName.FILE_CONTENTS.getFieldName()
         );
 
-        SearchResponse sr = tc.prepareSearch(config.getIndexName()).setTypes(config.getTypeName())
+        SearchResponse sr = tc.prepareSearch(ac.getIndexName()).setTypes(ac.getTypeName())
                 .setQuery(qb).setPostFilter( tqb)
                 .execute().actionGet();
 
@@ -110,11 +111,11 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public DocumentData getProduct(EsIndexConfig config, String productId) {
+    public DocumentData getProduct( String productId) {
 
         //  System.out.println(productId);
 
-        GetResponse getResponse = tc.prepareGet(config.getIndexName(), config.getTypeName(), productId)
+        GetResponse getResponse = tc.prepareGet(ac.getIndexName(), ac.getTypeName(), productId)
                 .setFields(SearchDocumentFieldName.productDocumentFields).execute().actionGet();
         //.setFields(SearchDocumentFieldName.allStoreTextDocumentFields) 对请求设置对象，否则无法自动赋值
 
@@ -139,9 +140,9 @@ public class ProductQueryServiceImpl implements ProductQueryService {
             dd.setFileStatus(getResponse.getField(SearchDocumentFieldName.FILE_STATUS.getFieldName()).getValue().toString());
             dd.setFileTitle(getResponse.getField(SearchDocumentFieldName.FILE_TITLE.getFieldName()).getValue().toString());
             dd.setGroupId(getResponse.getField(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName()).getValue().toString());
-            dd.setRealName(getResponse.getField(SearchDocumentFieldName.FILE_REAL_NAME.getFieldName()).getValue().toString());
+            dd.setRealName(getResponse.getField(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName()).getValue().toString());
             //dd.setTagName();
-            dd.setUserName(getResponse.getField(SearchDocumentFieldName.FILE_USER_NAME.getFieldName()).getValue().toString());
+            dd.setUserName(getResponse.getField(SearchDocumentFieldName.FILE_CREATER_USER_NAME.getFieldName()).getValue().toString());
             dd.setUserId(getResponse.getField(SearchDocumentFieldName.FILE_USER_ID.getFieldName()).getValue().toString());
             // integer
             dd.setFileSize(Integer.valueOf(getResponse.getField(SearchDocumentFieldName.FILE_SIZE.getFieldName()).getValue().toString()));
@@ -157,17 +158,17 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public List<AutoSuggestionEntry> getAutoSuggestions(EsIndexConfig config, String queryString) {
+    public List<AutoSuggestionEntry> getAutoSuggestions( String queryString) {
         return null;
     }
 
     @Override
-    public List<AutoSuggestionEntry> getAutoSuggestionsUsingTermsFacet(EsIndexConfig config, String string) {
+    public List<AutoSuggestionEntry> getAutoSuggestionsUsingTermsFacet( String string) {
         return null;
     }
 
     @Override
-    public List<DocumentData> findSimilarProducts(EsIndexConfig config, String[] fields, String productId) {
+    public List<DocumentData> findSimilarProducts( String[] fields, String productId) {
         return null;
     }
 }

@@ -1,10 +1,14 @@
-package com.yliyun.service.dao;/**
+package com.yliyun.service.dao;
+/**
  * Created by Administrator on 2016/10/15.
  */
 
+import com.yliyun.util.AppConfig;
 import com.yliyun.util.AppConstants;
+import com.yliyun.util.RestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +29,16 @@ public class ScheduledTasks {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
+
+    @Autowired
+    private AppConfig ac;
+
     @Scheduled(fixedRate = 5000)
     public void reportCurrentTime() {
         log.info("The time is now {}", dateFormat.format(new Date()));
+
+        System.out.println(ac.getDownloadUrl());
+
     }
 
 
@@ -41,7 +52,9 @@ public class ScheduledTasks {
 
         //AppConstants.storeMap.size();
 
-        if(AppConstants.storeMap.size() < 10){
+        // todo : get date form db & push into queue;
+
+        if(AppConstants.CACHE_STORE.size() < 10){
 
             System.out.println( "do scan db date ---------");
 
@@ -55,7 +68,7 @@ public class ScheduledTasks {
 
         //AppConstants.storeMap.size();
 
-        if(AppConstants.storeMap.size()>0){
+        if(AppConstants.CACHE_STORE.size()>0){
             System.out.println( "do index date ---------");
 
         }

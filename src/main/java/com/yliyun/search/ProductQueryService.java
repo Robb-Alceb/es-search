@@ -1,21 +1,20 @@
 package com.yliyun.search;
 
 import com.yliyun.model.DocumentData;
-import com.yliyun.model.EsIndexConfig;
 
 import java.util.List;
 
 public interface ProductQueryService
 {
-    ProductSearchResult searchProducts(EsIndexConfig config,SearchCriteria searchCriteria);
+    ProductSearchResult searchProducts(SearchCriteria searchCriteria);
 
-    ProductSearchResult baseSearch(EsIndexConfig config,String keyword);
+    ProductSearchResult baseSearch(String keyword);
 
-    DocumentData getProduct(EsIndexConfig config, String productId);
+    DocumentData getProduct( String productId);
     
-    List<AutoSuggestionEntry> getAutoSuggestions(EsIndexConfig config, String queryString);
+    List<AutoSuggestionEntry> getAutoSuggestions( String queryString);
 
-    List<AutoSuggestionEntry> getAutoSuggestionsUsingTermsFacet(EsIndexConfig config, String string);
+    List<AutoSuggestionEntry> getAutoSuggestionsUsingTermsFacet( String string);
 
-    List<DocumentData> findSimilarProducts(EsIndexConfig config, String[] fields, String productId);
+    List<DocumentData> findSimilarProducts( String[] fields, String productId);
 }

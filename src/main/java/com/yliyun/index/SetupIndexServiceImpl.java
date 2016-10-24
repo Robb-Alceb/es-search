@@ -1,15 +1,19 @@
 package com.yliyun.index;
 
-import com.yliyun.client.EsClient;
-import com.yliyun.model.EsIndexConfig;
+import com.yliyun.util.AppConfig;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -17,105 +21,117 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by Administrator on 2016/9/29.
  */
+@Service
 public class SetupIndexServiceImpl implements SetupIndexService {
 
-    TransportClient tc = EsClient.getInstance();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SetupIndexServiceImpl.class);
+
+    TransportClient tc = AppConfig.EsClient.getInstance();
+
+    @Autowired
+    private AppConfig ac;
 
 
     @Override
     public boolean isIndexExists(String indexName) {
-        //System.out.printf();
 
         ListenableActionFuture<IndicesExistsResponse> ll = tc.admin().indices().prepareExists(indexName).execute();
 
         try {
             IndicesExistsResponse ie = ll.get();
-            System.out.printf(ie.getContext().toString());
-            System.out.println(ie.isExists());
+
+            LOGGER.info("SetupIndexServiceImpl --->  isIndexExists -----> result : ", ie.getContext().toString());
+
+            tc.close();
+
+            return ie.isExists();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        tc.close();
-        return true;
+        return false;
     }
 
     @Override
     public boolean deleteIndex(String indexName) {
 
-        tc.admin().indices().prepareDelete(indexName).execute();
-        tc.close();
-        return true;
+        DeleteIndexResponse del = null;
+        try {
+            del = tc.admin().indices().prepareDelete(indexName).execute().get();
+            LOGGER.info("SetupIndexServiceImpl --->  deleteIndex -----> result : ", del.getContext().toString());
+            tc.close();
+            return true;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     @Override
-    public boolean createIndex(EsIndexConfig config) {
-
+    public boolean createIndex() {
+        // 注意此处设置
         Settings settings = Settings.settingsBuilder()
-                .put("index.number_of_shards", "3")
-                .put("index.number_of_replicas", "3").build();
+                .put("index.number_of_shards", "1")
+                .put("index.number_of_replicas", "1").build();
 
-        CreateIndexRequest cir = new CreateIndexRequest(config.getIndexName(), settings);
+        CreateIndexRequest cir = new CreateIndexRequest(ac.getIndexName(), settings);
 
         try {
-
-            CreateIndexResponse ci = tc.admin().indices().prepareCreate(config.getIndexName()).execute().actionGet();
-
+            CreateIndexResponse cis = tc.admin().indices().create(cir).actionGet();
+            LOGGER.info("SetupIndexServiceImpl --->  createIndex -----> result : ", cis.getContext().toString());
             tc.close();
 
             return true;
-            //  System.out.println(ci.getContext());
 
         } catch (Exception ex) {
-
-            System.out.println("has ex : " + ex);
-
+            LOGGER.error("SetupIndexServiceImpl --->  createIndex -----> ex---- : ", ex);
             return false;
 
         }
     }
 
     @Override
-    public boolean createMapping(EsIndexConfig config, XContentBuilder mappingBuilder) throws IOException, ExecutionException, InterruptedException {
+    public boolean createMapping(XContentBuilder mappingBuilder) {
 
-//        XContentBuilder mappingBuilder = XContentFactory.jsonBuilder()
-//                .startObject()
-//                .startObject("properties")
-//                .startObject("id").field("type", "string").field("index", "not_analyzed").endObject()
-//                .startObject("content").field("type", "string").field("analyzer", "ik_max_word").endObject()
-//                .endObject()
-//                .endObject();
+        PutMappingResponse pb = null;
 
-        ListenableActionFuture<PutMappingResponse>  pb =  tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mappingBuilder).execute();
-
-        System.out.println(pb.get().getContext().toString());
-
-        tc.close();
-        return false;
-    }
-
-    @Override
-    public boolean updateMapping(EsIndexConfig config, XContentBuilder mapping) throws IOException {
-
-//        XContentBuilder mappingBuilder  =XContentFactory.jsonBuilder().startObject()
-//                .startObject("properties")
-//                .startObject("id").field("type","string").field("index","not_analyzed").endObject()
-//                .startObject("content").field("type","string").field("analyzer","ik_max_word").endObject();
-
-        ListenableActionFuture<PutMappingResponse> mappRes = tc.admin().indices().preparePutMapping(config.getIndexName()).setType(config.getTypeName()).setSource(mapping).execute();
         try {
-            PutMappingResponse pmr = mappRes.get();
-            pmr.getContext();
-            System.out.println(pmr.getContext());
+            pb = tc.admin().indices()
+                    .preparePutMapping(ac.getIndexName()).setType(ac.getTypeName()).setSource(mappingBuilder).execute().get();
+
+            LOGGER.info("SetupIndexServiceImpl --->  createIndex -----> result : ", pb.getContext().toString());
+
+            tc.close();
+            return true;
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+        return false;
+    }
 
+    @Override
+    public boolean updateMapping(XContentBuilder mapping) throws IOException {
+
+
+        PutMappingResponse mappRes = null;
+        try {
+            mappRes = tc.admin().indices().preparePutMapping(ac.getIndexName()).setType(ac.getTypeName()).setSource(mapping).execute().get();
+            LOGGER.info("SetupIndexServiceImpl --->  updateMapping -----> result : ", mappRes.getContext().toString());
+            tc.close();
+            return true;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }
