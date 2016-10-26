@@ -6,6 +6,7 @@ package com.yliyun.search;
 import com.yliyun.index.SearchDocumentFieldName;
 import com.yliyun.model.DocumentData;
 import com.yliyun.util.AppConfig;
+import com.yliyun.util.EsClient;
 import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -33,7 +34,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     @Autowired
     private AppConfig ac;
 
-    TransportClient tc = AppConfig.EsClient.getInstance();
+    //TransportClient tc = EsClient.getInstance();
 
 
     @Override
@@ -63,7 +64,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 SearchDocumentFieldName.FILE_TITLE.getFieldName(), SearchDocumentFieldName.FILE_CONTENTS.getFieldName()
         );
 
-        SearchResponse sr = tc.prepareSearch(ac.getIndexName()).setTypes(ac.getTypeName())
+        SearchResponse sr = ac.getClient().prepareSearch(ac.getIndexName()).setTypes(ac.getTypeName())
                 .setQuery(qb).setPostFilter( tqb)
                 .execute().actionGet();
 
@@ -115,7 +116,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         //  System.out.println(productId);
 
-        GetResponse getResponse = tc.prepareGet(ac.getIndexName(), ac.getTypeName(), productId)
+        GetResponse getResponse = ac.getClient().prepareGet(ac.getIndexName(), ac.getTypeName(), productId)
                 .setFields(SearchDocumentFieldName.productDocumentFields).execute().actionGet();
         //.setFields(SearchDocumentFieldName.allStoreTextDocumentFields) 对请求设置对象，否则无法自动赋值
 
@@ -125,7 +126,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         System.out.println(getResponse.getSourceAsString());
 
 
-        tc.close();
+        ac.close();
 
         if (getResponse.isExists()) {
 

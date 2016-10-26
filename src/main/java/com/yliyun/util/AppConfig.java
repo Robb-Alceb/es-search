@@ -29,8 +29,20 @@ public class AppConfig {
     @Value("${app.index.type}")
     private String typeName;
 
+    @Value("${app.es.host}")
+    private String esHost;
 
 
+    private TransportClient client;
+
+
+    public String getEsHost() {
+        return esHost;
+    }
+
+    public void setEsHost(String esHost) {
+        this.esHost = esHost;
+    }
 
     public String getDownloadUrl() {
         return downloadUrl;
@@ -57,56 +69,29 @@ public class AppConfig {
     }
 
 
-    /**
-     * Created by Administrator on 2016/9/23.
-     */
-    public static class EsClient {
+    public TransportClient getClient() {
 
-        private static  String IP = "localhost";
-
-        private static TransportClient esc = null;
-
-        private  EsClient(TransportClient esc) {
-            this.esc = esc;
-        }
-
-        public static TransportClient getInstance (){
-
-            if(esc == null){
-
-                return getEsc();
-            }
-
-          return esc;
-
-        }
-
-        private static TransportClient getEsc() {
-
-            Settings settings = Settings.settingsBuilder()
-                    .put("cluster.name", "yliyun-es").build();
-
-            TransportClient client = null;
-            try {
-                client = TransportClient.builder().settings(settings).build()
-                        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(IP), 9300));
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            // .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-
-
+        if (this.client != null) {
             return client;
-
+        }
+        try {
+            Settings settings = Settings.settingsBuilder().put("cluster.name", "yliyun-es")
+                    .build();
+            client = TransportClient.builder().settings(settings).build()
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.getEsHost()), 9300));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
 
+        return client;
 
-        public void close(){
-
-            if(esc!=null){
-                esc.close();
-            }
-
-        }
     }
+
+    public  void close(){
+
+        client.close();
+    }
+
+
+
 }

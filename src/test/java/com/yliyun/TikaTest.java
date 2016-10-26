@@ -23,9 +23,9 @@ public class TikaTest {
     public  void testTike(){
 
         TikaUtils tu = new TikaUtils();
-        String content =  tu.fileToTxt(new File("D:\\work\\_kuaisofa\\commons.css"));
+       // String content =  tu.fileToTxt(new File("D:\\work\\_kuaisofa\\commons.css"));
 
-        System.out.println(content);
+     //   System.out.println(content);
 
 
     }

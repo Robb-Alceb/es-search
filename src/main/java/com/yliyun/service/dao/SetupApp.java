@@ -33,7 +33,7 @@ public class SetupApp {
 
         if (setupIndexService.isIndexExists(ac.getIndexName())) {
             if (setupIndexService.createIndex()) {
-               if(setupIndexService.createMapping(IndexMappingBuild.getDocumentTypeMapping())){
+               if(setupIndexService.createMapping(IndexMappingBuild.getDocumentTypeMapping(ac.getTypeName()))){
                     LOGGER.info("success !  this SetupApp is complete ! ");
                }
             }

@@ -70,10 +70,20 @@ public class IndexTask {
     // todo : add to es
 
 
+    /*****
+     *
+     * @param cf
+     */
+    private void updateDocStatus(CommonFile cf){
+
+      //  indexServices.updateData();
+
+    }
+
+
     private void indexNewDoc(CommonFile cf) {
 
         if (indexServices.isDocExists(cf.getFile_id())) {
-
             // 分析文件
             try {
                 getContents(cf);

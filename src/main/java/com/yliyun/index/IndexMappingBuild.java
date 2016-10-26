@@ -1,8 +1,10 @@
 package com.yliyun.index;
 
+import com.yliyun.util.AppConfig;
 import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
@@ -12,16 +14,17 @@ import java.io.IOException;
 public class IndexMappingBuild {
 
 
-    public static XContentBuilder getDocumentTypeMapping(){
+
+    public static XContentBuilder getDocumentTypeMapping(String typeName){
 
         try {
-            XContentBuilder builder = XContentFactory.jsonBuilder().startObject().startObject("properties");
+            XContentBuilder builder = XContentFactory.jsonBuilder().startObject().startObject(typeName).startObject("properties");
 
             addLiveDateMapping(builder);
             addFullTextMapping(builder);
             addAllStoreMapping(builder);
 
-            builder.endObject().endObject();
+            builder.endObject().endObject().endObject();
 
             return builder;
 
@@ -39,7 +42,7 @@ public class IndexMappingBuild {
         for (int i = 0; i < len; i++) {
             builder.startObject(SearchDocumentFieldName.dateTextDocumentFields[i])
                     .field(ElasticSearchReservedWords.TYPE.getText(), ElasticSearchReservedWords.DATE.getText())
-                    .field(ElasticSearchReservedWords.FORMAT.getText(), SearchDateUtils.SEARCH_DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SSSZZ)
+                    .field(ElasticSearchReservedWords.FORMAT.getText(), SearchDateUtils.pattern)
                     .field(ElasticSearchReservedWords.STORE.getText(), ElasticSearchReservedWords.YES.getText())
                     .field(ElasticSearchReservedWords.INDEX.getText(), ElasticSearchReservedWords.NOT_ANALYZED.getText())
                     .endObject();

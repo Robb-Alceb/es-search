@@ -2,6 +2,8 @@ package com.yliyun.index;
 
 import com.yliyun.model.CommonFile;
 import com.yliyun.util.AppConfig;
+import com.yliyun.util.EsClient;
+import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +36,8 @@ public class IndexDateImpl implements IndexDataService {
     private AppConfig ac;
 
 
-    TransportClient tc = AppConfig.EsClient.getInstance();
+    //TransportClient tc = EsClient.getClient();
+
 
 
     private static final Logger logger = LoggerFactory.getLogger(IndexDateImpl.class);
@@ -48,7 +52,9 @@ public class IndexDateImpl implements IndexDataService {
 
             logger.info("IndexDateImpl  --->  indexData ---> result : ", ir.getContext());
 
-            tc.close();
+            ac.close();
+
+           // tc.close();
 
             return true;
         } catch (Exception ex) {
@@ -70,9 +76,11 @@ public class IndexDateImpl implements IndexDataService {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
-        IndexRequestBuilder indexRequestBuilder = tc.prepareIndex(ac.getIndexName(), ac.getTypeName(), String.valueOf(doc.getFile_id()));
+        IndexRequestBuilder indexRequestBuilder = ac.getClient().prepareIndex(ac.getIndexName(), ac.getTypeName(), String.valueOf(doc.getFile_id()));
 
         indexRequestBuilder.setSource(contentBuilder);
 
@@ -80,7 +88,7 @@ public class IndexDateImpl implements IndexDataService {
 
     }
 
-    private XContentBuilder getXContentBuilderForAProduct(CommonFile doc) throws IOException {
+    private XContentBuilder getXContentBuilderForAProduct(CommonFile doc) throws IOException, ParseException {
 
         XContentBuilder contentBuilder = null;
         try {
@@ -94,19 +102,24 @@ public class IndexDateImpl implements IndexDataService {
                     .field(SearchDocumentFieldName.FILE_CREATE_TIME.getFieldName(), doc.getCreate_time())
 
                     .field(SearchDocumentFieldName.FILE_IS_FOLDER.getFieldName(), doc.getFolder())
-                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), doc.getUpdate_time())
                     .field(SearchDocumentFieldName.FILE_UPDATE_USER_ID.getFieldName(), doc.getUpdate_user_id())
-                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), doc.getUpdate_user_name())
 
-                    .field(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName(), doc.getGroup_id())
+
+                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), SearchDateUtils.parse(doc.getUpdate_user_name()))
+                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(),SearchDateUtils.parse( doc.getUpdate_time()))
+
                     .field(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), doc.getDoc_type())
-                    .field(SearchDocumentFieldName.FILE_ID.getFieldName(), doc.getFile_id())
                     .field(SearchDocumentFieldName.FILE_SIZE.getFieldName(), doc.getFile_size())
 
+                    .field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), doc.getFile_name())
                     .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), doc.getFile_contents())
 
-                    .field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), doc.getFile_name())
+
                     .field(SearchDocumentFieldName.FILE_USER_ID.getFieldName(), doc.getUser_id())
+                    .field(SearchDocumentFieldName.FILE_ID.getFieldName(), doc.getFile_id())
+                    .field(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName(), doc.getGroup_id())
+                    .field(SearchDocumentFieldName.FILE_PARENT_ID.getFieldName(), doc.getParent_id())
+                    .field(SearchDocumentFieldName.FS_FILE_ID.getFieldName(), doc.getFs_file_id())
             ;
 
             contentBuilder.endObject();
@@ -124,7 +137,7 @@ public class IndexDateImpl implements IndexDataService {
     public void indexData(Map<String, Object> mapping) {
 
         // tc.prepareIndex().setSource();
-        tc.prepareIndex(ac.getIndexName(), ac.getTypeName()).setSource(mapping).get();
+        ac.getClient().prepareIndex(ac.getIndexName(), ac.getTypeName()).setSource(mapping).get();
 
 
     }
@@ -155,9 +168,9 @@ public class IndexDateImpl implements IndexDataService {
     public boolean isDocExists(Long fileId) {
 
 
-        boolean l = tc.prepareGet().setIndex(ac.getIndexName()).setId(String.valueOf(fileId)).get().isExists();
+        boolean l = ac.getClient().prepareGet().setIndex(ac.getIndexName()).setId(String.valueOf(fileId)).get().isExists();
 
-        tc.close();
+        ac.close();
 
         return l;
     }
@@ -166,20 +179,19 @@ public class IndexDateImpl implements IndexDataService {
     @Override
     public void updateData(Map<String, Object> map) {
 
-
         UpdateRequest ur = new UpdateRequest();
         ur.index(ac.getIndexName());
         ur.type(ac.getTypeName());
         ur.id(map.get("_id").toString());
         ur.doc(map);
-        tc.update(ur).actionGet();
+        ac.getClient().update(ur).actionGet();
     }
 
     @Override
     public void delData(Long id) {
 
 
-        DeleteResponse response = tc.prepareDelete(ac.getIndexName(), ac.getTypeName(), id + "").get();
+        DeleteResponse response = ac.getClient().prepareDelete(ac.getIndexName(), ac.getTypeName(), id + "").get();
 
         System.out.println("del doc data: " + response.getContext().toString());
 
@@ -189,7 +201,7 @@ public class IndexDateImpl implements IndexDataService {
 
     protected BulkResponse processBulkRequests(List<IndexRequestBuilder> requests) {
         if (requests.size() > 0) {
-            BulkRequestBuilder bulkRequest = tc.prepareBulk();
+            BulkRequestBuilder bulkRequest = ac.getClient().prepareBulk();
 
             for (IndexRequestBuilder indexRequestBuilder : requests) {
                 bulkRequest.add(indexRequestBuilder);
@@ -203,7 +215,7 @@ public class IndexDateImpl implements IndexDataService {
                 // process failures by iterating through each bulk response item
                 logger.error("bulk operation indexing has failures:" + bulkResponse.buildFailureMessage());
             }
-            tc.close();
+            ac.close();
             return bulkResponse;
         } else {
             logger.debug("Executing bulk index request for size: 0");
