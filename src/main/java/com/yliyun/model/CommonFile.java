@@ -274,4 +274,38 @@ public class CommonFile {
     public CommonFile() {
 
     }
+
+    @Override
+    public String toString() {
+        return "CommonFile{" +
+                "file_id=" + file_id +
+                ", parent_id=" + parent_id +
+                ", fs_file_id=" + fs_file_id +
+                ", trash_id=" + trash_id +
+                ", parent_ids='" + parent_ids + '\'' +
+                ", layer=" + layer +
+                ", file_path='" + file_path + '\'' +
+                ", file_name='" + file_name + '\'' +
+                ", file_size=" + file_size +
+                ", thumb='" + thumb + '\'' +
+                ", folder=" + folder +
+                ", doc_type=" + doc_type +
+                ", file_version=" + file_version +
+                ", file_action='" + file_action + '\'' +
+                ", del_status=" + del_status +
+                ", creater_id=" + creater_id +
+                ", creater_name='" + creater_name + '\'' +
+                ", create_time='" + create_time + '\'' +
+                ", update_user_id=" + update_user_id +
+                ", update_user_name='" + update_user_name + '\'' +
+                ", update_time='" + update_time + '\'' +
+                ", search_status=" + search_status +
+                ", top_dept_folder=" + top_dept_folder +
+                ", dept_id=" + dept_id +
+                ", user_id=" + user_id +
+                ", group_id=" + group_id +
+                ", file_category='" + file_category + '\'' +
+                ", file_contents='" + file_contents + '\'' +
+                '}';
+    }
 }

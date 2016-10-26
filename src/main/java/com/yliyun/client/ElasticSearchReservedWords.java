@@ -1,4 +1,4 @@
-package com.yliyun.index;
+package com.yliyun.client;
 
 public enum ElasticSearchReservedWords
 {

@@ -57,7 +57,7 @@ public class FileServiceImpl implements FilesService {
     @Override
     public String getDownloadUrl(Long fsId) {
 
-        String sql = "SELECT  * from  WHERE fs_file_id = ? ";
+        String sql = "SELECT  * from fs_file WHERE fs_file_id = ? ";
 
         Fs_file fsList = fileJdbcTemplate.queryForObject(sql, new Object[]{fsId}, Fs_file.class);
 

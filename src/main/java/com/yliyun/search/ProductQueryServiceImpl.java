@@ -126,7 +126,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         System.out.println(getResponse.getSourceAsString());
 
 
-        ac.close();
+      //  ac.close();
 
         if (getResponse.isExists()) {
 

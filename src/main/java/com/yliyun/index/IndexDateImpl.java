@@ -10,6 +10,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
@@ -39,7 +40,6 @@ public class IndexDateImpl implements IndexDataService {
     //TransportClient tc = EsClient.getClient();
 
 
-
     private static final Logger logger = LoggerFactory.getLogger(IndexDateImpl.class);
 
     @Override
@@ -52,9 +52,9 @@ public class IndexDateImpl implements IndexDataService {
 
             logger.info("IndexDateImpl  --->  indexData ---> result : ", ir.getContext());
 
-            ac.close();
+           // ac.close();
 
-           // tc.close();
+            // tc.close();
 
             return true;
         } catch (Exception ex) {
@@ -105,8 +105,8 @@ public class IndexDateImpl implements IndexDataService {
                     .field(SearchDocumentFieldName.FILE_UPDATE_USER_ID.getFieldName(), doc.getUpdate_user_id())
 
 
-                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), SearchDateUtils.parse(doc.getUpdate_user_name()))
-                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(),SearchDateUtils.parse( doc.getUpdate_time()))
+                    .field(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName(), doc.getUpdate_user_name())
+                    .field(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), doc.getUpdate_time())
 
                     .field(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), doc.getDoc_type())
                     .field(SearchDocumentFieldName.FILE_SIZE.getFieldName(), doc.getFile_size())
@@ -170,29 +170,30 @@ public class IndexDateImpl implements IndexDataService {
 
         boolean l = ac.getClient().prepareGet().setIndex(ac.getIndexName()).setId(String.valueOf(fileId)).get().isExists();
 
-        ac.close();
+       // ac.close();
 
         return l;
     }
 
 
     @Override
-    public void updateData(Map<String, Object> map) {
+    public void updateData(Map<String, Object> map, Long fileId) {
 
         UpdateRequest ur = new UpdateRequest();
         ur.index(ac.getIndexName());
         ur.type(ac.getTypeName());
-        ur.id(map.get("_id").toString());
+        ur.id(fileId + "");
         ur.doc(map);
-        ac.getClient().update(ur).actionGet();
+        UpdateResponse urs = ac.getClient().update(ur).actionGet();
+
+      //  ac.close();
+
     }
 
     @Override
     public void delData(Long id) {
 
-
         DeleteResponse response = ac.getClient().prepareDelete(ac.getIndexName(), ac.getTypeName(), id + "").get();
-
         System.out.println("del doc data: " + response.getContext().toString());
 
         logger.debug("del doc data: " + response.getContext().toString());
@@ -215,7 +216,7 @@ public class IndexDateImpl implements IndexDataService {
                 // process failures by iterating through each bulk response item
                 logger.error("bulk operation indexing has failures:" + bulkResponse.buildFailureMessage());
             }
-            ac.close();
+            //ac.close();
             return bulkResponse;
         } else {
             logger.debug("Executing bulk index request for size: 0");

@@ -24,7 +24,7 @@ public interface IndexDataService {
     boolean isDocExists(Long fileId);
 
 
-    void updateData(Map<String, Object> map);
+    void updateData(Map<String, Object> map, Long fileId);
 
 
     // 删除该条索引

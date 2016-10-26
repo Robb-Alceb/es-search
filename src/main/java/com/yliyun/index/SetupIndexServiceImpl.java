@@ -44,7 +44,7 @@ public class SetupIndexServiceImpl implements SetupIndexService {
 
             LOGGER.info("SetupIndexServiceImpl --->  isIndexExists -----> result : ", ie.getContext().toString());
 
-            ac.close();
+          //  ac.close();
 
             return ie.isExists();
 
@@ -63,7 +63,7 @@ public class SetupIndexServiceImpl implements SetupIndexService {
         try {
             del = ac.getClient().admin().indices().prepareDelete(indexName).execute().get();
             LOGGER.info("SetupIndexServiceImpl --->  deleteIndex -----> result : ", del.getContext().toString());
-            ac.close();
+           // ac.close();
             return true;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -86,7 +86,7 @@ public class SetupIndexServiceImpl implements SetupIndexService {
         try {
             CreateIndexResponse cis = ac.getClient().admin().indices().create(cir).actionGet();
             LOGGER.info("SetupIndexServiceImpl --->  createIndex -----> result : ", cis.getContext().toString());
-            ac.close();
+          //  ac.close();
 
             return true;
 
@@ -110,7 +110,7 @@ public class SetupIndexServiceImpl implements SetupIndexService {
 
             LOGGER.info("SetupIndexServiceImpl --->  createIndex -----> result : ", pb.getContext().toString());
 
-            ac.close();
+          //  ac.close();
             return true;
 
         } catch (InterruptedException e) {
@@ -129,7 +129,7 @@ public class SetupIndexServiceImpl implements SetupIndexService {
         try {
             mappRes = ac.getClient().admin().indices().preparePutMapping(ac.getIndexName()).setType(ac.getTypeName()).setSource(mapping).execute().get();
             LOGGER.info("SetupIndexServiceImpl --->  updateMapping -----> result : ", mappRes.getContext().toString());
-            ac.close();
+          //  ac.close();
             return true;
         } catch (InterruptedException e) {
             e.printStackTrace();

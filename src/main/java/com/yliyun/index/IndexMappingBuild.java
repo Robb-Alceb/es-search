@@ -1,10 +1,9 @@
 package com.yliyun.index;
 
-import com.yliyun.util.AppConfig;
+import com.yliyun.client.ElasticSearchReservedWords;
 import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 

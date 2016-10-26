@@ -9,8 +9,11 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 /***
  * create with IDEA
@@ -20,55 +23,30 @@ import java.net.UnknownHostException;
  */
 public class EsClient {
 
-
     private static final Logger logger = LoggerFactory.getLogger(EsClient.class);
 
     private  static  String searchServerClusterName = "yliyun-es";
 
     private static  String IP = "127.0.0.1";
 
-    private static Client client;
+    static Map<String, String> m = new HashMap<String, String>();
+    // 设置client.transport.sniff为true来使客户端去嗅探整个集群的状态，把集群中其它机器的ip地址加到客户端中，
+    static Settings settings = Settings.settingsBuilder().put(m).put("cluster.name","yliyun-es").put("client.transport.sniff", true).build();
 
-    public static  Client getClient()
-    {
-        if(client == null)
-        {
-            client = createClient();
+    // 创建私有对象
+    private static TransportClient client;
+
+    static {
+        try {
+            client = TransportClient.builder().settings(settings).build()
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(IP), 9300));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-
-        return client;
     }
 
-    //    @PostConstruct
-    protected static Client createClient()
-    {
-        if(client == null)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Creating client for Search!");
-            }
-            //Try starting search client at context loading
-            try
-            {
-                Settings settings = Settings.settingsBuilder().put("cluster.name", searchServerClusterName).build();
-
-                TransportClient transportClient =  TransportClient.builder().settings(settings).build();
-
-                transportClient = transportClient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(IP), 9300));
-
-                if(transportClient.connectedNodes().size() == 0)
-                {
-                    logger.error("There are no active nodes available for the transport, it will be automatically added once nodes are live!");
-                }
-                client = transportClient;
-            }
-            catch(Exception ex)
-            {
-                //ignore any exception, dont want to stop context loading
-                logger.error("Error occured while creating search client!", ex);
-            }
-        }
+    // 取得实例
+    public static synchronized TransportClient getTransportClient() {
         return client;
     }
 }

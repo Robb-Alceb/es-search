@@ -2,10 +2,7 @@ package com.yliyun;/**
  * Created by Administrator on 2016/10/24.
  */
 
-import com.yliyun.index.IndexDataService;
-import com.yliyun.index.IndexDateImpl;
-import com.yliyun.index.IndexMappingBuild;
-import com.yliyun.index.SetupIndexService;
+import com.yliyun.index.*;
 import com.yliyun.model.CommonFile;
 import com.yliyun.util.AppConfig;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -17,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /***
@@ -83,6 +82,21 @@ public class IndexTest {
         cf.setGroup_id(324234l);
 
         indexService.indexData(cf);
+
+    }
+
+
+    @Test
+    public void testUpdateIndex(){
+
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        map.put(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(),"public");
+
+        map.put(SearchDocumentFieldName.FILE_SIZE.getFieldName(),85555L);
+        map.put(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(),"2016-10-26 11:49:08");
+
+        indexService.updateData(map, 1234455l);
 
     }
 

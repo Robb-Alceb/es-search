@@ -7,9 +7,13 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.tags.EscapeBodyTag;
 
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 /***
  * create with IDEA
@@ -33,10 +37,10 @@ public class AppConfig {
     private String esHost;
 
 
-    private TransportClient client;
+//    private TransportClient client;
 
 
-    public String getEsHost() {
+    public  String  getEsHost() {
         return esHost;
     }
 
@@ -68,29 +72,36 @@ public class AppConfig {
         this.typeName = typeName;
     }
 
-
-    public TransportClient getClient() {
-
-        if (this.client != null) {
-            return client;
-        }
-        try {
-            Settings settings = Settings.settingsBuilder().put("cluster.name", "yliyun-es")
-                    .build();
-            client = TransportClient.builder().settings(settings).build()
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.getEsHost()), 9300));
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        return client;
-
+    public TransportClient getClient(){
+        return EsClient.getTransportClient();
     }
 
-    public  void close(){
 
-        client.close();
-    }
+//    public TransportClient getClient() {
+//
+//        if (this.client != null) {
+//            return client;
+//        }
+//        try {
+//            Settings settings = Settings.settingsBuilder().put("cluster.name", "yliyun-es")
+//                    .build();
+//            client = TransportClient.builder().settings(settings).build()
+//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.getEsHost()), 9300));
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return client;
+//
+//    }
+
+//    public  void close(){
+//
+//        client.close();
+//    }
+
+
+
 
 
 
