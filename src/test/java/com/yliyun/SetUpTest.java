@@ -1,20 +1,5 @@
 package com.yliyun;
 
-import com.yliyun.index.*;
-import com.yliyun.model.DocumentData;
-import com.yliyun.search.ForSearch;
-import com.yliyun.search.ProductQueryService;
-import com.yliyun.search.ProductQueryServiceImpl;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 /**
  * Created by Administrator on 2016/9/29.
  */

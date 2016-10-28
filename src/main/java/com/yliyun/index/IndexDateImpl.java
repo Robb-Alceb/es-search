@@ -1,9 +1,8 @@
 package com.yliyun.index;
 
+import com.yliyun.client.SearchDocumentFieldName;
 import com.yliyun.model.CommonFile;
 import com.yliyun.util.AppConfig;
-import com.yliyun.util.EsClient;
-import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -11,7 +10,6 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

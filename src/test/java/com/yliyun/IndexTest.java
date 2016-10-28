@@ -2,11 +2,11 @@ package com.yliyun;/**
  * Created by Administrator on 2016/10/24.
  */
 
+import com.yliyun.client.SearchDocumentFieldName;
 import com.yliyun.index.*;
 import com.yliyun.model.CommonFile;
 import com.yliyun.util.AppConfig;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.IndexService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

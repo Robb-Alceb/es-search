@@ -1,4 +1,4 @@
-package com.yliyun.index;
+package com.yliyun.client;
 
 /**
  * Created by manbuzhiwu on 2016/10/1.
@@ -6,41 +6,44 @@ package com.yliyun.index;
 public enum SearchDocumentFieldName
 {
 
+
+
     // all id
     FILE_ID("file_id"),
-    FILE_USER_ID("file_user_id"),
-    FILE_GROUP_ID("file_group_id"),
-    FILE_DEPT_ID("file_dept_id"),
+    FILE_USER_ID("user_id"),
+    FILE_GROUP_ID("group_id"),
+    FILE_DEPT_ID("dept_id"),
 
-    FILE_PARENT_ID("file_parent_id"),
+    FILE_PARENT_ID("parent_id"),
     FS_FILE_ID("fs_file_id"),
 
 
     // 全文分析
-    FILE_TITLE("file_title"),// 标题
+    FILE_TITLE("file_name"),// 标题
     FILE_CONTENTS("file_contents"),// 内容
 
 
     // filter boolean 状态
-    FILE_STATUS("file_status"), // 状态
-    FILE_IS_FOLDER("file_is_folder"),
+    FILE_STATUS("del_status"), // 状态
+    FILE_IS_FOLDER("folder"),
 
     // filter other
 
-    FILE_EXT_NAME("file_ext_name"),// 格式
+    FILE_EXT_NAME("doc_type"),// 格式
+
     FILE_CATEGORY("file_category"),// 分区
-    FILE_CREATER_USER_NAME("file_create_user_name"),
-    FILE_UPDATE_USER_NAME("file_update_user_name"),
+    FILE_CREATER_USER_NAME("creater_name"),
+    FILE_UPDATE_USER_NAME("update_user_name"),
 
     // filter date
-    FILE_CREATE_TIME("file_create_time"),
-    FILE_UPDATE_TIME("file_update_time"),
+    FILE_CREATE_TIME("create_time"),
+    FILE_UPDATE_TIME("update_time"),
 
 
     // filter date
     FILE_SIZE("file_size"),
-    FILE_CREATER_USER_ID("file_create_user_id"),
-    FILE_UPDATE_USER_ID("file_update_user_id"),
+    FILE_CREATER_USER_ID("creater_id"),
+    FILE_UPDATE_USER_ID("update_user_id"),
 
     ;
 
@@ -97,6 +100,9 @@ public enum SearchDocumentFieldName
 
             FILE_CREATER_USER_ID.getFieldName(),
             FILE_UPDATE_USER_ID.getFieldName(),
+
+            FILE_IS_FOLDER.getFieldName(),
+            FILE_STATUS.getFieldName(),
     };
 
     public static final String[] dateTextDocumentFields = {

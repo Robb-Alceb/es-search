@@ -22,6 +22,8 @@ public class CommonFile {
     private Long doc_type;
     private Long file_version;
     private String file_action;
+
+    // 0 正常 ， 1 删除
     private Long del_status;
 
     private Long creater_id;

@@ -2,7 +2,7 @@ package com.yliyun;/**
  * Created by Administrator on 2016/10/10.
  */
 
-import com.yliyun.index.SearchDocumentFieldName;
+import com.yliyun.client.SearchDocumentFieldName;
 import org.junit.Test;
 
 /***

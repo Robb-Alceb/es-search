@@ -4,7 +4,10 @@ package com.yliyun.util;/**
 
 import com.yliyun.model.CommonFile;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +22,7 @@ public class AppConstants {
 
     public static String[] TABLES = {"group_file", "personal_file", "public_file"};
 
-    public  static  int INDEX_FAIL = 64;
+    public static int INDEX_FAIL = 64;
 
     public static String TABLE_GROUP_FILE = TABLES[0];
     public static String TABLE_PERSONAL_FILE = TABLES[1];
@@ -33,21 +36,30 @@ public class AppConstants {
 
     public static String DOWNLOAD_ADDR = "download/";
 
+    public static String[] docs = {"ppt", "pptx", "doc", "docx", "wps", "pps", "pptm", "xls",
+            "xlsx", "xlt", "xltm", "xlsm", "xlts", "xlw", "vsd", "vsdx", "dot", "pdf", "rtf", "dwg", "dxf", "html", "htm"
+            , "txt", "md"};
+
+    public static Map<String, Integer> typeMap = new HashMap<String, Integer>();
+
+    static {
+
+        for (int i = 0; i < docs.length; i++) {
+            typeMap.put(docs[i], 1);
+        }
+    }
+
 
     /***
      * 取数据；
      * @return
      */
     public static CommonFile getToQueueData() throws InterruptedException {
-        CommonFile cf = null;
-        cf = CACHE_STORE.take();
-        return cf;
-
+        return CACHE_STORE.take();
     }
 
 
     public static void pushToQueueData(List<CommonFile> cfList) {
-
         if (cfList.size() > 0) {
             for (CommonFile commonFile : cfList) {
                 try {
@@ -59,28 +71,5 @@ public class AppConstants {
         }
     }
 
-    public static void main(String[] args) {
-
-        int rename = 0b0010;
-        int fileUp = 0b0100;
-        int statusUp = 0b1000;
-
-        System.out.println(rename | fileUp);
-
-        System.out.println(rename & 0b0111);
-
-        Long st = new Long(4);
-
-        System.out.println(st.byteValue() & rename);
-
-        String[] update = new String[3];
-        // System.out.println(update.toString());
-        for (int i = 0; i < update.length; i++) {
-            System.out.println(update[i]);
-
-
-        }
-
-    }
 
 }

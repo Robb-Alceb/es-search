@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +50,9 @@ public class FileServiceImpl implements FilesService {
 
     public void download(String url, String fileName) throws IOException {
 
-        byte[] fileByte = restTemplate.getForObject(url, byte[].class);
+        System.out.println("----------download-------, " + url);
+
+        byte[] fileByte = restTemplate.getForObject("http://"+url, byte[].class);
         Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
 
         LOGGER.info("FileServiceImpl > download  success !! ", "download/" + fileName);
@@ -59,7 +63,10 @@ public class FileServiceImpl implements FilesService {
 
         String sql = "SELECT  * from fs_file WHERE fs_file_id = ? ";
 
-        Fs_file fsList = fileJdbcTemplate.queryForObject(sql, new Object[]{fsId}, Fs_file.class);
+        LOGGER.info("FileServiceImpl > getDownloadUrl   ", "sql: " + sql);
+
+
+        Fs_file fsList = fileJdbcTemplate.queryForObject(sql, new Object[]{fsId}, new FsFileMapper());
 
         return fsList.getFile_name();
     }

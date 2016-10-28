@@ -1,6 +1,7 @@
 package com.yliyun.index;
 
 import com.yliyun.client.ElasticSearchReservedWords;
+import com.yliyun.client.SearchDocumentFieldName;
 import com.yliyun.util.SearchDateUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -56,9 +57,16 @@ public class IndexMappingBuild {
 
         for (int i = 0; i < len; i++) {
 
+            if(SearchDocumentFieldName.fullTextDocumentFields[i].equals(SearchDocumentFieldName.FILE_CONTENTS.getFieldName())){
+                builder.startObject(SearchDocumentFieldName.fullTextDocumentFields[i])
+                        .field(ElasticSearchReservedWords.TYPE.getText(), ElasticSearchReservedWords.STRING.getText())
+                        .field(ElasticSearchReservedWords.STORE.getText(), ElasticSearchReservedWords.NO.getText())
+                        .field(ElasticSearchReservedWords.ANALYZER.getText(), ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
+                        .endObject();
+            }
+
             builder.startObject(SearchDocumentFieldName.fullTextDocumentFields[i])
                     .field(ElasticSearchReservedWords.TYPE.getText(), ElasticSearchReservedWords.STRING.getText())
-                   // .field(ElasticSearchReservedWords.FORMAT.getText(), SearchDateUtils.SEARCH_DATE_FORMAT_YYYY_MM_DD_T_HH_MM_SSSZZ)
                     .field(ElasticSearchReservedWords.STORE.getText(), ElasticSearchReservedWords.YES.getText())
                     .field(ElasticSearchReservedWords.ANALYZER.getText(), ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
                     .endObject();
@@ -73,6 +81,7 @@ public class IndexMappingBuild {
 
         int len =   SearchDocumentFieldName.allStoreTextDocumentFields.length;
         for (int i = 0; i < len; i++) {
+
             builder.startObject(SearchDocumentFieldName.allStoreTextDocumentFields[i])
                     .field(ElasticSearchReservedWords.TYPE.getText(), ElasticSearchReservedWords.STRING.getText())
                     .field(ElasticSearchReservedWords.STORE.getText(), ElasticSearchReservedWords.YES.getText())

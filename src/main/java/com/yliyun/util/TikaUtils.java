@@ -63,7 +63,7 @@ public class TikaUtils {
         //   metadata.set(Metadata.AUTHOR, "空号");//重新设置文档的媒体内容
         //  metadata.set(Metadata.RESOURCE_NAME_KEY, f.getName());
         is = new FileInputStream(f);
-        BodyContentHandler handler = new BodyContentHandler();
+        BodyContentHandler handler = new BodyContentHandler(200 * 1024 * 1024);
         ParseContext context = new ParseContext();
         context.set(Parser.class, parser);
         parser.parse(is, handler, metadata, context);

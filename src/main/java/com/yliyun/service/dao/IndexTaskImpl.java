@@ -5,7 +5,7 @@ package com.yliyun.service.dao;
  */
 
 import com.yliyun.index.IndexDataService;
-import com.yliyun.index.SearchDocumentFieldName;
+import com.yliyun.client.SearchDocumentFieldName;
 import com.yliyun.model.CommonFile;
 import com.yliyun.util.AppConfig;
 import com.yliyun.util.AppConstants;
@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +61,7 @@ public class IndexTaskImpl implements IndexTask {
         if (cf.getSearch_status() == 0) {
             log.info(">>>>>>>>>>>>>>>>>>  is  new file : ", cf.getFile_name());
             indexNewDoc(cf);
+
         } else {
             log.info(">>>>>>>>>>>>>>>>>>  is  update file : ", cf.getFile_name());
             FileUpdates upds = chk(cf.getSearch_status());
@@ -124,7 +124,7 @@ public class IndexTaskImpl implements IndexTask {
      */
     private void indexNewDoc(CommonFile cf) {
 
-        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" + cf.getFile_id());
+        System.out.println("<------------------indexNewDoc----------------------------->" + cf.getFile_id());
 
         boolean is = indexServices.isDocExists(cf.getFile_id());
 
@@ -133,7 +133,8 @@ public class IndexTaskImpl implements IndexTask {
         if (!is) {
 
             // 分析文件
-            if (cf.getFolder() == 0) {
+            // 1 图片，2 文档，3 音乐， 4 视频， 5 应用， 6 其他
+            if (cf.getFolder() == 0 && cf.getDoc_type() == 2) {
 
                 try {
                     getContents(cf);
@@ -168,24 +169,34 @@ public class IndexTaskImpl implements IndexTask {
 
         String storeAddr = AppConstants.DOWNLOAD_ADDR + cf.getFile_name();
 
+        log.info("storeAddr---------------------------------> : ",storeAddr);
+
         String storePath = filesService.getDownloadUrl(cf.getFs_file_id());
+
+        log.info("-----------------storePath----------------> : ",storePath);
 
         String url = ac.getDownloadUrl() + storePath;
 
-        filesService.download(url, storeAddr);
+
+        log.info("------------download-----url----------------> : ",url);
 
 
-        log.info("download file : ", url);
+        filesService.download(url, cf.getFile_name());
 
         File indexFile = new File(storeAddr);
 
-        log.info("get file content start : ", indexFile.getName());
+        log.info("get file content start --------------------: ", indexFile.getName());
+
         String txt = TikaUtils.fileToTxt(indexFile);
-        log.info("get file content end  : ", txt);
+
+        log.info("get file content end ------------------ : ", txt);
 
         cf.setFile_contents(txt);
 
-        indexFile.deleteOnExit();
+        boolean l = indexFile.delete();
+        if(l){
+            log.info("del - "+cf.getFile_name());
+        }
 
         return cf;
     }

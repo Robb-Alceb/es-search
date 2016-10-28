@@ -6,9 +6,9 @@ package com.yliyun.search;/**
  * create with IDEA
  * User : manbuzhiwu
  * Date : 2016/10/11 - 14:01
- *
+ * 查询聚合结果
  */
-public class FacetResultEntry {
+public class AggregationResultEntry {
 
     private String term;
 

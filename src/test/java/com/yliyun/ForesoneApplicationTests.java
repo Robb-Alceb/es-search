@@ -23,16 +23,19 @@ import java.util.Map;
 @SpringBootTest
 public class ForesoneApplicationTests {
 
-    @Autowired
-    @Qualifier("primaryJdbcTemplate")
-    protected JdbcTemplate jdbcTemplate1;
-
-    @Autowired
-    @Qualifier("secondaryJdbcTemplate")
-    protected JdbcTemplate jdbcTemplate2;
 
     @Autowired
     private FilesService filesService;
+
+
+    @Test
+    public void testJDBC(){
+        filesService.getFilesList("personal_file");
+        filesService.getFilesList("group_file");
+
+        filesService.getFilesList("public_file");
+
+    }
 
 
 //	@Before
@@ -53,21 +56,21 @@ public class ForesoneApplicationTests {
 
     }
 
-    @Test
-    public void testGetFiles(){
-        System.out.println(filesService.getFilesList(AppConstants.TABLE_GROUP_FILE));
-    }
-
-    @Test
-    public  void testDownload(){
-
-        try {
-            filesService.download("http://192.168.0.130/group1/M00/00/0B/wKgAglgAkpeAFhKYAAFA4xm-U2A687.pdf", "test.pdf");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+//    @Test
+//    public void testGetFiles(){
+//        System.out.println(filesService.getFilesList(AppConstants.TABLE_GROUP_FILE));
+//    }
+//
+//    @Test
+//    public  void testDownload(){
+//
+//        try {
+//            filesService.download("http://192.168.0.130/group1/M00/00/0B/wKgAglgAkpeAFhKYAAFA4xm-U2A687.pdf", "test.pdf");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
 
 
 

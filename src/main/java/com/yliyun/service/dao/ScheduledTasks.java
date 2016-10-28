@@ -42,11 +42,8 @@ public class ScheduledTasks {
     @Autowired
     private IndexTask indexTask;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     public void reportCurrentTime() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
-
-        System.out.println(ac.getDownloadUrl());
 
     }
 
@@ -55,44 +52,43 @@ public class ScheduledTasks {
      * 数据库的扫描策略
      * 当队列中数据 < 10 时进行数据添加
      */
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 50000)
     public void scanDB() {
         log.info("The time  start scan the db : ", dateFormat.format(new Date()));
+//        scanDb();
 
-        //AppConstants.storeMap.size();
-
-        if (AppConstants.CACHE_STORE.size() < 2) {
-
-            List<CommonFile> cfList = filesService.getFilesList("personal_file");
-
-            if (cfList.size() == 0) {
-                cfList = filesService.getFilesList("group_file");
-            }
-
-            if (cfList.size() == 0) {
-                cfList = filesService.getFilesList("public_file");
-            }
-
-            if (cfList.size() > 0) {
-
-                AppConstants.pushToQueueData(cfList);
-
-                log.info("pushed data in queue-----------");
-
-            } else {
-                log.info("full index  is complete!!!!");
-            }
-
-        }
     }
 
 
-    @Scheduled(fixedRate = 3000)
-
+    @Scheduled(fixedRate = 4000)
     public void indexFile() {
 
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " + AppConstants.CACHE_STORE.size());
 
+//        indexTask();
+
+    }
+
+    private void scanDb() {
+        List<CommonFile> cfList = filesService.getFilesList("personal_file");
+
+        if (cfList.size() == 0) {
+            cfList = filesService.getFilesList("group_file");
+        }
+
+        if (cfList.size() == 0) {
+            cfList = filesService.getFilesList("public_file");
+        }
+
+        if (cfList.size() > 0) {
+
+            AppConstants.pushToQueueData(cfList);
+
+            log.info("pushed data in queue-----------");
+        }
+    }
+
+    private void indexTask() {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " + AppConstants.CACHE_STORE.size());
         if (AppConstants.CACHE_STORE.size() > 0) {
 
             log.info("The time start  indexFile --------", AppConstants.CACHE_STORE.size());
