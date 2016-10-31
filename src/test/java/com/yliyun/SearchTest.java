@@ -33,7 +33,7 @@ public class SearchTest {
 
     @Test
     public void testBaseSearch(){
-        queryService.baseSearch("会务","98");
+        queryService.baseSearch("会务","98",0,20);
     }
 
 

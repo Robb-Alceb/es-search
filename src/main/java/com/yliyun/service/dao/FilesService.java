@@ -4,6 +4,7 @@ package com.yliyun.service.dao;/**
 
 import com.yliyun.model.CommonFile;
 import com.yliyun.model.Group_file;
+import com.yliyun.model.Group_member;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
@@ -32,5 +33,7 @@ public interface FilesService {
 
     boolean updateFileStatus(CommonFile cf, int result);
 
+
+    List<Group_member> getGroupList(String userId);
 
 }

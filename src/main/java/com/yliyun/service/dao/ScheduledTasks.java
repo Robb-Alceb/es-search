@@ -42,50 +42,55 @@ public class ScheduledTasks {
     @Autowired
     private IndexTask indexTask;
 
-    @Scheduled(fixedRate = 10000)
-    public void reportCurrentTime() {
-
-    }
-
 
     /***
      * 数据库的扫描策略
      * 当队列中数据 < 10 时进行数据添加
      */
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 20000)
     public void scanDB() {
         log.info("The time  start scan the db : ", dateFormat.format(new Date()));
-//        scanDb();
+
+        if (AppConstants.CACHE_STORE.size() < 2) {
+            scanDb();
+        } else {
+            log.info("The time  this index queue have   -----------  ", AppConstants.CACHE_STORE.size(), "---waiting-----");
+        }
+
 
     }
 
 
-    @Scheduled(fixedRate = 4000)
+    @Scheduled(fixedRate = 3000)
     public void indexFile() {
-
-
-//        indexTask();
-
+        indexTask();
     }
 
     private void scanDb() {
-        List<CommonFile> cfList = filesService.getFilesList("personal_file");
 
-        if (cfList.size() == 0) {
-            cfList = filesService.getFilesList("group_file");
+        // 索引已经更新的数据
+        for (int i = 0; i < AppConstants.TABLES.length; i++) {
+
+            List<CommonFile> upFileList = filesService.getUpFilesList(AppConstants.TABLES[i]);
+
+            if (upFileList.size() > 0) {
+                AppConstants.pushToQueueData(upFileList);
+            }
         }
 
-        if (cfList.size() == 0) {
-            cfList = filesService.getFilesList("public_file");
-        }
+        // 索引新的数据
+        for (int i = 0; i < AppConstants.TABLES.length; i++) {
 
-        if (cfList.size() > 0) {
+            List<CommonFile> cfFileList = filesService.getFilesList(AppConstants.TABLES[i]);
 
-            AppConstants.pushToQueueData(cfList);
+            if (cfFileList.size() > 0) {
 
-            log.info("pushed data in queue-----------");
+                AppConstants.pushToQueueData(cfFileList);
+            }
+
         }
     }
+
 
     private void indexTask() {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " + AppConstants.CACHE_STORE.size());

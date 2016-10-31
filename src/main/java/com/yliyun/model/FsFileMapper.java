@@ -22,7 +22,6 @@ public class FsFileMapper implements RowMapper<Fs_file> {
         Fs_file gf = new Fs_file();
 
         gf.setFs_file_id(rs.getLong("fs_file_id"));
-
         gf.setCreate_time(rs.getString("create_time"));
         gf.setFile_name(rs.getString("file_name"));
         gf.setFile_size(rs.getLong("file_size"));

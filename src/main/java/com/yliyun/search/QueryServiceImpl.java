@@ -6,6 +6,8 @@ package com.yliyun.search;
 import com.yliyun.client.ElasticSearchReservedWords;
 import com.yliyun.client.SearchDocumentFieldName;
 import com.yliyun.model.CommonFile;
+import com.yliyun.model.Group_member;
+import com.yliyun.service.dao.FilesService;
 import com.yliyun.util.AppConfig;
 import com.yliyun.util.Json;
 import org.apache.lucene.search.BooleanQuery;
@@ -39,13 +41,29 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private AppConfig ac;
 
+
+    @Autowired
+    private FilesService filesService;
+
     //TransportClient tc = EsClient.getInstance();
 
 
     @Override
-    public List<String> baseSearch(String keyword, String userId) {
+    public SearchResult baseSearch(String keyword, String userId, int from, int size) {
 
-        String[] joinGroups = {};
+        List<Group_member> gml = filesService.getGroupList(userId);
+
+        List<String> gids = new ArrayList<String>();
+
+        System.out.println(gml.size());
+
+        for (Group_member group_member : gml) {
+            gids.add(group_member.getGroup_id() + "");
+        }
+
+        System.out.println(gids.size());
+
+        Object[] joinGroups =  gids.toArray();
 
         // 全文搜索字段
         QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(keyword).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
@@ -62,7 +80,7 @@ public class QueryServiceImpl implements QueryService {
 
         QueryBuilder filterPub = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(), "public"));
 
-        QueryBuilder filterAll  = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
+        QueryBuilder filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
         QueryBuilder tqb = boolQuery()
                 .must(qqb)
                 .must(filterAll)
@@ -78,13 +96,25 @@ public class QueryServiceImpl implements QueryService {
                 // 任意搜索添加聚合
                 .addAggregation(getAggregation())
                 .setExplain(true)
-
+                .setFrom(from)
+                .setSize(size)
                 .execute().actionGet();
 
         System.out.println(sr.getHits().totalHits());
         Terms agg = sr.getAggregations().get("agg");
 
+        SearchResult srs  = new SearchResult();
+
         System.out.println("agg----------------------: " + agg.getBuckets().size());
+        String aggs = null;
+        try {
+            aggs = Json.toJson(agg.getBuckets());
+            System.out.println("agg------------pppp----------: " + Json.toJson(agg.getBuckets()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        srs.setAgg(aggs);
 
         for (Terms.Bucket entry : agg.getBuckets()) {
             String key = (String) entry.getKey(); // bucket key
@@ -93,12 +123,12 @@ public class QueryServiceImpl implements QueryService {
             System.out.println("key " + key + " doc_count " + docCount);
 
             // We ask for top_hits for each bucket
-            TopHits topHits = entry.getAggregations().get("top");
-
-            for (SearchHit hit : topHits.getHits().getHits()) {
-                System.out.println(" -> id " + hit.getId() + " _source [{}]"
-                        + hit.getSource().get("file_name"));
-            }
+//            TopHits topHits = entry.getAggregations().get("top");
+//
+//            for (SearchHit hit : topHits.getHits().getHits()) {
+//                System.out.println(" -> id " + hit.getId() + " _source [{}]"
+//                        + hit.getSource().get("file_name"));
+//            }
         }
 
         List<String> list = new ArrayList<String>();
@@ -109,7 +139,9 @@ public class QueryServiceImpl implements QueryService {
             System.out.println(searchHit.getSourceAsString());
             list.add(searchHit.getSourceAsString());
         }
-        return list;
+
+        srs.setFileList(list);
+        return srs;
     }
 
 

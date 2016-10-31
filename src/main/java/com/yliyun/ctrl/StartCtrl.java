@@ -1,6 +1,7 @@
 package com.yliyun.ctrl;
 
 import com.yliyun.search.QueryService;
+import com.yliyun.search.SearchResult;
 import com.yliyun.util.Receiver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -53,9 +54,10 @@ public class StartCtrl {
     }
 
     @RequestMapping("/fsearch")
-    public List<String> search(@PathVariable String userId, @PathVariable String keyword) {
+    public SearchResult search(@PathVariable String userId, @PathVariable
+            String keyword, @PathVariable int from, @PathVariable int size) {
 
-        return queryService.baseSearch(keyword,userId);
+        return queryService.baseSearch(keyword, userId, from, size);
     }
 
 }

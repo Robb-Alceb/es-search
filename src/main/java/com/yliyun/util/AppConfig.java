@@ -36,9 +36,20 @@ public class AppConfig {
     @Value("${app.es.host}")
     private String esHost;
 
+    @Value("${app.index.dbpage}")
+    private int dbPage;
+
 
 //    private TransportClient client;
 
+
+    public int getDbPage() {
+        return dbPage;
+    }
+
+    public void setDbPage(int dbPage) {
+        this.dbPage = dbPage;
+    }
 
     public  String  getEsHost() {
         return esHost;

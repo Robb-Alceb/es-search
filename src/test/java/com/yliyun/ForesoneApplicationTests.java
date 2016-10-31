@@ -73,5 +73,11 @@ public class ForesoneApplicationTests {
 //
 
 
+    @Test
+    public  void testGetGroup(){
+
+        System.out.println( filesService.getGroupList("98").size());
+    }
+
 
 }

@@ -5,6 +5,7 @@ package com.yliyun.service.dao;
  */
 
 import com.yliyun.model.*;
+import com.yliyun.util.AppConfig;
 import com.yliyun.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,10 @@ public class FileServiceImpl implements FilesService {
 
 
     @Autowired
+    private AppConfig ac;
+
+
+    @Autowired
     private RestTemplate restTemplate;
 
 
@@ -52,7 +57,7 @@ public class FileServiceImpl implements FilesService {
 
         System.out.println("----------download-------, " + url);
 
-        byte[] fileByte = restTemplate.getForObject("http://"+url, byte[].class);
+        byte[] fileByte = restTemplate.getForObject("http://" + url, byte[].class);
         Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
 
         LOGGER.info("FileServiceImpl > download  success !! ", "download/" + fileName);
@@ -89,6 +94,17 @@ public class FileServiceImpl implements FilesService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Group_member> getGroupList(String userId) {
+
+        String sql = "SELECT  * from group_member WHERE user_id =  " + userId;
+
+        LOGGER.info("FileServiceImpl > getGroupList   ", "sql: " + sql);
+
+        return fileJdbcTemplate.query(sql, new GroupMemberMapper());
+
     }
 
 
@@ -133,7 +149,7 @@ public class FileServiceImpl implements FilesService {
     @Override
     public List<CommonFile> getUpFilesList(String tableName) {
 
-        String sql = "select *  from  " + tableName + "  where search_status > 1 limit  0, 10";
+        String sql = "select *  from  " + tableName + "  where search_status > 1 limit  0, "+ac.getDbPage();
 
         LOGGER.info("FileServiceImpl > getFilesList  tableName & sql : " + tableName + " & sql : " + sql);
 
@@ -143,7 +159,7 @@ public class FileServiceImpl implements FilesService {
     @Override
     public List<CommonFile> getFilesList(String tableName) {
 
-        String sql = "select *  from  " + tableName + "  where  search_status = 0 limit  0, 10";
+        String sql = "select *  from  " + tableName + "  where  search_status = 0 limit  0,  "+ac.getDbPage();
 
         LOGGER.info("FileServiceImpl > getFilesList  tableName & sql : " + tableName + " & sql : " + sql);
 

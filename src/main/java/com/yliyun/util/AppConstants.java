@@ -28,7 +28,7 @@ public class AppConstants {
     public static String TABLE_PERSONAL_FILE = TABLES[1];
     public static String TABLE_PUBLIC_FILE = TABLES[2];
 
-    public static BlockingQueue<CommonFile> CACHE_STORE = new ArrayBlockingQueue<CommonFile>(30);
+    public static BlockingQueue<CommonFile> CACHE_STORE = new ArrayBlockingQueue<CommonFile>(150);
 
     public static String D_RENAME = "rename";
     public static String D_FILE_UP = "fileUp";

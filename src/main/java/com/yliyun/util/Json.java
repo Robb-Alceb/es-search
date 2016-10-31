@@ -4,6 +4,9 @@ package com.yliyun.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * json
  * 
@@ -61,5 +64,7 @@ public final class Json {
 	public static <T> T parseArray(String json, TypeReference<T> typeRef) throws Exception {
 		return mapper.readValue(json, typeRef);
 	}
+
+
 
 }
