@@ -46,13 +46,10 @@ public class IndexTaskImpl implements IndexTask {
 
     public void analysisAComFile() throws IOException, InterruptedException {
 
-        System.out.println("the queue size ---: " + AppConstants.CACHE_STORE.size());
 
         CommonFile cf = AppConstants.getToQueueData();
 
         System.out.println("the queue size ***  : " + AppConstants.CACHE_STORE.size());
-
-        System.out.println(cf == null);
 
         if (cf.getFile_id() == null) return;
 
@@ -63,22 +60,23 @@ public class IndexTaskImpl implements IndexTask {
             indexNewDoc(cf);
 
         } else {
-            log.info(">>>>>>>>>>>>>>>>>>  is  update file : ", cf.getFile_name());
             FileUpdates upds = chk(cf.getSearch_status());
 
             if (upds.getStatusUp()) {
+
+                log.info(">>>>>>>-----StatusUp---->>>>>>>>>>>  is  update file : ");
 
                 if (cf.getDel_status() == 0) {
                     updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0, cf.getFile_id());
                 } else {
                     updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 1, cf.getFile_id());
                 }
-
                 filesService.updateFileStatus(cf, 1);
                 return; // 跳出执行
             }
             //  更新文件内容
             if (upds.getFileUp()) {
+                log.info(">>>>>>>-----Content-Up---->>>>>>>>>>>  is  update file : ");
                 try {
                     getContents(cf);
                     updateDocStatus(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), cf.getFile_contents(), cf.getFile_id());
@@ -90,9 +88,9 @@ public class IndexTaskImpl implements IndexTask {
 
                 return;
             }
-
             // 更新文件名
             if (upds.getReName()) {
+                log.info(">>>>>>>-----reName-Up---->>>>>>>>>>>  is  update file : ");
                 updateDocStatus(SearchDocumentFieldName.FILE_TITLE.getFieldName(), cf.getFile_name(), cf.getFile_id());
                 filesService.updateFileStatus(cf, 1);
                 return;
@@ -129,9 +127,7 @@ public class IndexTaskImpl implements IndexTask {
         boolean is = indexServices.isDocExists(cf.getFile_id());
 
         System.out.println(is);
-
         if (!is) {
-
             // 分析文件
             // 1 图片，2 文档，3 音乐， 4 视频， 5 应用， 6 其他
             if (cf.getFolder() == 0 && cf.getDoc_type() == 2) {
@@ -143,9 +139,7 @@ public class IndexTaskImpl implements IndexTask {
                     // 索引失败
                     filesService.updateFileStatus(cf, AppConstants.INDEX_FAIL);
                 }
-
             }
-
             // 插入索引
             if (indexServices.indexData(cf)) {
                 // 索引成功
@@ -154,7 +148,13 @@ public class IndexTaskImpl implements IndexTask {
                 // 索引失败
                 filesService.updateFileStatus(cf, AppConstants.INDEX_FAIL);
             }
+        }else{
+
+            System.out.println("***************************,update db!");
+
+            filesService.updateFileStatus(cf, 1);
         }
+
 
     }
 

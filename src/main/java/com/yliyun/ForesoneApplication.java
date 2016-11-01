@@ -27,12 +27,8 @@ public class ForesoneApplication {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ForesoneApplication.class);
 
 
-
-
 	public static void main(String[] args) throws InterruptedException {
 		ApplicationContext ctx =	SpringApplication.run(ForesoneApplication.class, args);
-
-
 
 
 

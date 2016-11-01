@@ -40,24 +40,19 @@ public class IndexTest {
 
 
     @Test
-    public void test(){
-
+    public void test() {
         System.out.println(setupIndexService.isIndexExists(ac.getIndexName()));
-
-
-
     }
 
     @Test
-    public void testCreate(){
+    public void testCreate() {
         System.out.println(setupIndexService.createIndex());
-        ;
     }
 
     @Test
     public void testmapping() throws InterruptedException, ExecutionException, IOException {
 
-        XContentBuilder sb =  IndexMappingBuild.getDocumentTypeMapping(ac.getTypeName());
+        XContentBuilder sb = IndexMappingBuild.getDocumentTypeMapping(ac.getTypeName());
 
         System.out.println(sb.prettyPrint());
 
@@ -67,10 +62,10 @@ public class IndexTest {
     }
 
     @Test
-    public  void testIndex(){
+    public void testIndex() {
         CommonFile cf = new CommonFile();
         cf.setFile_category("group");
-       // cf.setTop_dept_folder("");
+        // cf.setTop_dept_folder("");
         cf.setFile_contents("w啊打飞机啊收到了付款啊啊数据库的风景拉屎的风景啊上的浪费啊上的浪费啊上的浪费啊上的浪费");
         cf.setFile_id(1234455l);
         cf.setFile_name("理解啊快递发咯接受对方阿三发射点.txt");
@@ -87,14 +82,14 @@ public class IndexTest {
 
 
     @Test
-    public void testUpdateIndex(){
+    public void testUpdateIndex() {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        map.put(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(),"public");
+        map.put(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(), "public");
 
-        map.put(SearchDocumentFieldName.FILE_SIZE.getFieldName(),85555L);
-        map.put(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(),"2016-10-26 11:49:08");
+        map.put(SearchDocumentFieldName.FILE_SIZE.getFieldName(), 85555L);
+        map.put(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), "2016-10-26 11:49:08");
 
         indexService.updateData(map, 1234455l);
 
