@@ -3,6 +3,7 @@ package com.yliyun.search;/**
  */
 
 import java.util.List;
+import java.util.Map;
 
 /***
  * create with IDEA
@@ -12,17 +13,22 @@ import java.util.List;
  */
 public class SearchResult {
 
-    private String agg;
+    /***
+     * 建议结果
+     */
+    private Map<String, Long> types;
 
+    /***
+     * 文件列表结果
+     */
     private List<String> fileList;
 
-
-    public String getAgg() {
-        return agg;
+    public Map<String, Long> getTypes() {
+        return types;
     }
 
-    public void setAgg(String agg) {
-        this.agg = agg;
+    public void setTypes(Map<String, Long> types) {
+        this.types = types;
     }
 
     public List<String> getFileList() {

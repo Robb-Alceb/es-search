@@ -71,5 +71,12 @@ public class AppConstants {
         }
     }
 
+    public static String  getTypeName(String number){
+
+        String [] typeArr = {"pic","doc","music","video","app","other"};
+
+        return typeArr[Integer.parseInt(number)-1];
+    }
+
 
 }

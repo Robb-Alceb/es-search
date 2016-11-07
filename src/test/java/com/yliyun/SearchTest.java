@@ -3,6 +3,7 @@ package com.yliyun;
  * Created by Administrator on 2016/10/27.
  */
 
+import com.yliyun.ctrl.SearchParam;
 import com.yliyun.search.QueryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,14 @@ public class SearchTest {
 
     @Test
     public void testBaseSearch(){
-        queryService.baseSearch("会务","98",0,20);
+
+        SearchParam sp = new SearchParam();
+        sp.setSize(20);
+        sp.setFrom(0);
+        sp.setKeyword("hello");
+        sp.setUserId(99l);
+
+        queryService.baseSearch(sp);
     }
 
 

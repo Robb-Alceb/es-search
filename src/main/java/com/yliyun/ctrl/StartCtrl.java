@@ -7,10 +7,7 @@ import com.yliyun.search.SearchResult;
 import com.yliyun.util.AppConfig;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -42,10 +39,11 @@ public class StartCtrl {
     }
 
     @RequestMapping(value = "/fsearch", method = RequestMethod.POST)
-    public SearchResult search(@PathVariable String userId, @PathVariable
-            String keyword, @PathVariable int from, @PathVariable int size) {
+    public SearchResult search(@RequestBody SearchParam param ) {
 
-        return queryService.baseSearch(keyword, userId, from, size);
+        System.out.println("param:"+param.toString());
+
+        return queryService.baseSearch(param);
     }
 
 
