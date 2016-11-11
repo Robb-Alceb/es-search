@@ -23,6 +23,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.tophits.TopHits;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public SearchResult baseSearch(SearchParam param) {
 
-        List<Group_member> gml = filesService.getGroupList(param.getUserId()+"");
+        List<Group_member> gml = filesService.getGroupList(param.getUserId() + "");
 
         List<String> gids = new ArrayList<String>();
 
@@ -67,13 +68,14 @@ public class QueryServiceImpl implements QueryService {
 
         System.out.println(gids.size());
 
-        Object[] joinGroups =  gids.toArray();
+        Object[] joinGroups = gids.toArray();
 
         // 全文搜索字段
         QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(param.getKeyword()).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
                 .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 0.8f)
                 .analyzer(ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
+
 
         // 个人文件过滤字段
         QueryBuilder filterPersonal = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_USER_ID.getFieldName(), param.getUserId()));
@@ -84,12 +86,33 @@ public class QueryServiceImpl implements QueryService {
 
         QueryBuilder filterPub = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_CATEGORY.getFieldName(), "public"));
 
-        QueryBuilder filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
+        QueryBuilder filterAll = null;
+
+        if (param.getFileCategory() == null) {
+            filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
+        } else if (param.getFileCategory().equals(AppConstants.FC_PERSONAL)) {
+            filterAll = boolQuery().should(filterPersonal);
+        } else if (param.getFileCategory().equals(AppConstants.FC_GROUP)) {
+            filterAll = boolQuery().should(filterGroup);
+        } else {
+            filterAll = boolQuery().should(filterPub);
+        }
+
+        String [] allType ={"0","1","2","3","4","5","6"};
+
+        QueryBuilder filterType  = boolQuery().must(termsQuery(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), allType));
+
+        if (param.getDocTypoe() != null) {
+            filterType = boolQuery().must(termsQuery(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), param.getDocTypoe()));
+        }
+
+        // QueryBuilder filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
+
         QueryBuilder tqb = boolQuery()
                 .must(qqb)
                 .must(filterAll)
-                // .must(boolQuery().must(termQuery(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0)))
-                ;
+                .must(filterType)
+                .must(boolQuery().must(termQuery(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0)));
 
         System.out.println(tqb.toString());
 
@@ -100,34 +123,98 @@ public class QueryServiceImpl implements QueryService {
                 // 任意搜索添加聚合
                 .addAggregation(getAggregation())
                 .setExplain(true)
-                .setFrom(param.getFrom())
-                .setSize(param.getSize())
+                .setFrom(param.getOffset())
+                .setSize(param.getLimit())
+                .setHighlighterNoMatchSize(80)
+                .setHighlighterPreTags("<em>")
+                .setHighlighterPostTags("</em>")
+                .addHighlightedField(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 50)
                 .execute().actionGet();
 
-      //  System.out.println(sr.getHits().totalHits());
+        //  System.out.println(sr.getHits().totalHits());
         Terms agg = sr.getAggregations().get("agg");
 
-        SearchResult srs  = new SearchResult();
+        SearchResult srs = new SearchResult();
 
-        Map<String, Long> typeMap = new  HashMap<String,Long>();
+        Map<String, Long> typeMap = new HashMap<String, Long>();
         for (Terms.Bucket entry : agg.getBuckets()) {
             String key = (String) entry.getKey(); // bucket key
             long docCount = entry.getDocCount(); // Doc count
             System.out.println("key " + key + " doc_count " + docCount);
-            typeMap.put(AppConstants.getTypeName(key),docCount);
+            typeMap.put(AppConstants.getTypeName(key), docCount);
         }
         srs.setTypes(typeMap);
 
-        List<String> list = new ArrayList<String>();
+        List<CommonFile> list = new ArrayList<CommonFile>();
 
         for (SearchHit searchHit : sr.getHits()) {
-           // System.out.println(searchHit.getId());
-            System.out.println(searchHit.getSourceAsString());
-            list.add(searchHit.getSourceAsString());
+            // System.out.println(searchHit.getId());
+
+            // System.out.println(searchHit.getSourceAsString());
+            // System.out.println(searchHit.getSource());
+
+            Map<String, Object> rsMap = searchHit.getSource();
+
+            Map<String, HighlightField> result = searchHit.highlightFields();
+            // System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_TITLE.getFieldName()));
+            //  System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()));
+            CommonFile cf = searchRsToCom(rsMap, result);
+
+            list.add(cf);
+
+
         }
 
         srs.setFileList(list);
         return srs;
+    }
+
+    private CommonFile searchRsToCom(Map<String, Object> rsMap, Map<String, HighlightField> hmap) {
+        CommonFile cf = new CommonFile();
+        cf.setDel_status(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_STATUS.getFieldName()).toString()));
+
+        if (rsMap.get(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName()) != null) {
+            cf.setGroup_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_GROUP_ID.getFieldName()).toString()));
+        }
+        cf.setFolder(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_IS_FOLDER.getFieldName()).toString()));
+
+        if (rsMap.get(SearchDocumentFieldName.FILE_DEPT_ID.getFieldName()) != null) {
+
+            cf.setDept_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_DEPT_ID.getFieldName()).toString()));
+        }
+
+        cf.setFile_category(rsMap.get(SearchDocumentFieldName.FILE_CATEGORY.getFieldName()).toString());
+        cf.setCreate_time(rsMap.get(SearchDocumentFieldName.FILE_CREATE_TIME.getFieldName()).toString());
+        cf.setCreater_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_CREATER_USER_ID.getFieldName()).toString()));
+        cf.setCreater_name(rsMap.get(SearchDocumentFieldName.FILE_CREATER_USER_NAME.getFieldName()).toString());
+        cf.setDoc_type(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName()).toString()));
+        cf.setFile_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_ID.getFieldName()).toString()));
+        cf.setFile_name(rsMap.get(SearchDocumentFieldName.FILE_TITLE.getFieldName()).toString());
+        cf.setFile_size(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_SIZE.getFieldName()).toString()));
+        cf.setFs_file_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FS_FILE_ID.getFieldName()).toString()));
+
+        if (rsMap.get(SearchDocumentFieldName.FILE_PARENT_ID.getFieldName()) != null) {
+            cf.setParent_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_PARENT_ID.getFieldName()).toString()));
+        }
+        if (rsMap.get(SearchDocumentFieldName.FILE_USER_ID.getFieldName()) != null) {
+            cf.setUser_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_USER_ID.getFieldName()).toString()));
+        }
+        if (rsMap.get(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName()) != null) {
+            cf.setUpdate_user_name(rsMap.get(SearchDocumentFieldName.FILE_UPDATE_USER_NAME.getFieldName()).toString());
+        }
+
+        if (rsMap.get(SearchDocumentFieldName.FILE_UPDATE_USER_ID.getFieldName()) != null) {
+            cf.setUpdate_user_id(Long.parseLong(rsMap.get(SearchDocumentFieldName.FILE_UPDATE_USER_ID.getFieldName())+""));
+        }
+
+        if (rsMap.get(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName()) != null) {
+            cf.setUpdate_time(rsMap.get(SearchDocumentFieldName.FILE_UPDATE_TIME)+"");
+        }
+        if (rsMap.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()) != null) {
+            cf.setFile_contents(hmap.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName())+"");
+        }
+
+        return cf;
     }
 
 

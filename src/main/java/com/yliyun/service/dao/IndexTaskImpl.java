@@ -49,7 +49,7 @@ public class IndexTaskImpl implements IndexTask {
 
         CommonFile cf = AppConstants.getToQueueData();
 
-        System.out.println("the queue size ***  : " + AppConstants.CACHE_STORE.size());
+      //  System.out.println("the queue size ***  : " + AppConstants.CACHE_STORE.size());
 
         if (cf.getFile_id() == null) return;
 
@@ -60,6 +60,13 @@ public class IndexTaskImpl implements IndexTask {
             indexNewDoc(cf);
 
         } else {
+
+            boolean is = indexServices.isDocExists(cf.getFile_id());
+            if(!is){
+                indexNewDoc(cf);
+                return ;
+            }
+
             FileUpdates upds = chk(cf.getSearch_status());
 
             if (upds.getStatusUp()) {
@@ -129,12 +136,14 @@ public class IndexTaskImpl implements IndexTask {
         System.out.println(is);
         if (!is) {
             // 分析文件
-            // 1 图片，2 文档，3 音乐， 4 视频， 5 应用， 6 其他
+            //0其他  1 图片，2 文档，3 音乐， 4 视频， 5 应用， 6 压缩包
             if (cf.getFolder() == 0 && cf.getDoc_type() == 2) {
 
                 try {
                     getContents(cf);
                 } catch (Exception e) {
+
+                    log.error("===================index fail==============,",cf.getFile_id());
                     e.printStackTrace();
                     // 索引失败
                     filesService.updateFileStatus(cf, AppConstants.INDEX_FAIL);
@@ -150,7 +159,9 @@ public class IndexTaskImpl implements IndexTask {
             }
         }else{
 
-            System.out.println("***************************,update db!");
+           /// System.out.println("***************************,update db!");
+
+            log.info("this doc is exits!!!    id is :"+ cf.getFile_id());
 
             filesService.updateFileStatus(cf, 1);
         }
@@ -169,16 +180,16 @@ public class IndexTaskImpl implements IndexTask {
 
         String storeAddr = AppConstants.DOWNLOAD_ADDR + cf.getFile_name();
 
-        log.info("storeAddr---------------------------------> : ",storeAddr);
+       // log.info("storeAddr---------------------------------> : ",storeAddr);
 
         String storePath = filesService.getDownloadUrl(cf.getFs_file_id());
 
-        log.info("-----------------storePath----------------> : ",storePath);
+      //  log.info("-----------------storePath----------------> : ",storePath);
 
         String url = ac.getDownloadUrl() + storePath;
 
 
-        log.info("------------download-----url----------------> : ",url);
+       // log.info("------------download-----url----------------> : ",url);
 
 
         filesService.download(url, cf.getFile_name());

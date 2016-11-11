@@ -14,10 +14,22 @@ public class SearchParam  implements Serializable {
 
     private Long userId;
     private String keyword;
-    private int from;
-    private int size;
+    private int offset;
+    private int limit;
+    private String fileCategory;
+    private String groupId;
+    private String docTypoe;
+
 
     public SearchParam() {
+    }
+
+    public String getDocTypoe() {
+        return docTypoe;
+    }
+
+    public void setDocTypoe(String docTypoe) {
+        this.docTypoe = docTypoe;
     }
 
     public Long getUserId() {
@@ -36,20 +48,36 @@ public class SearchParam  implements Serializable {
         this.keyword = keyword;
     }
 
-    public int getFrom() {
-        return from;
+    public int getOffset() {
+        return offset;
     }
 
-    public void setFrom(int from) {
-        this.from = from;
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
-    public int getSize() {
-        return size;
+    public int getLimit() {
+        return limit;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public String getFileCategory() {
+        return fileCategory;
+    }
+
+    public void setFileCategory(String fileCategory) {
+        this.fileCategory = fileCategory;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     @Override
@@ -57,8 +85,10 @@ public class SearchParam  implements Serializable {
         return "SearchParam{" +
                 "userId=" + userId +
                 ", keyword='" + keyword + '\'' +
-                ", from=" + from +
-                ", size=" + size +
+                ", offset=" + offset +
+                ", limit=" + limit +
+                ", fileCategory='" + fileCategory + '\'' +
+                ", groupId='" + groupId + '\'' +
                 '}';
     }
 }

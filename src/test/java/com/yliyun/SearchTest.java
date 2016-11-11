@@ -5,6 +5,8 @@ package com.yliyun;
 
 import com.yliyun.ctrl.SearchParam;
 import com.yliyun.search.QueryService;
+import com.yliyun.util.AppConstants;
+import com.yliyun.util.Json;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +39,19 @@ public class SearchTest {
     public void testBaseSearch(){
 
         SearchParam sp = new SearchParam();
-        sp.setSize(20);
-        sp.setFrom(0);
-        sp.setKeyword("hello");
+        sp.setLimit(20);
+        sp.setOffset(0);
+        sp.setKeyword("文件");
         sp.setUserId(99l);
+       // sp.setDocTypoe("2");
+        //sp.setFileCategory(AppConstants.FC_PUBLIC);
 
-        queryService.baseSearch(sp);
+        try {
+            System.out.println(Json.toJson( queryService.baseSearch(sp)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 

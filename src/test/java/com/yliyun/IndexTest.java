@@ -91,7 +91,13 @@ public class IndexTest {
         map.put(SearchDocumentFieldName.FILE_SIZE.getFieldName(), 85555L);
         map.put(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName(), "2016-10-26 11:49:08");
 
-        indexService.updateData(map, 1234455l);
+        indexService.updateData(map, 12355l);
+
+    }
+
+    @Test
+    public void docIsExits(){
+        System.out.println(indexService.isDocExists(889999l));
 
     }
 

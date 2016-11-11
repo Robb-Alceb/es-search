@@ -21,6 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AppConstants {
 
     public static String[] TABLES = {"group_file", "personal_file", "public_file"};
+    public static String[] FC = {"personal", "group", "public"};
+    public static String FC_PERSONAL = FC[0];
+    public static String FC_GROUP = FC[1];
+    public static String FC_PUBLIC = FC[2];
 
     public static int INDEX_FAIL = 64;
 
@@ -71,11 +75,11 @@ public class AppConstants {
         }
     }
 
-    public static String  getTypeName(String number){
+    public static String getTypeName(String number) {
 
-        String [] typeArr = {"pic","doc","music","video","app","other"};
+        String[] typeArr = {"other", "pic", "doc", "audio", "video", "app", "zip"};
 
-        return typeArr[Integer.parseInt(number)-1];
+        return typeArr[Integer.parseInt(number)];
     }
 
 

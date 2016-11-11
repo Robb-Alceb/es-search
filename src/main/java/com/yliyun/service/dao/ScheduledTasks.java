@@ -61,7 +61,7 @@ public class ScheduledTasks {
     }
 
 
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRate = 2000)
     public void indexFile() {
         indexTask();
     }
@@ -73,6 +73,8 @@ public class ScheduledTasks {
 
             List<CommonFile> upFileList = filesService.getUpFilesList(AppConstants.TABLES[i]);
 
+            System.out.println(upFileList);
+
             if (upFileList.size() > 0) {
                 AppConstants.pushToQueueData(upFileList);
             }
@@ -82,6 +84,8 @@ public class ScheduledTasks {
         for (int i = 0; i < AppConstants.TABLES.length; i++) {
 
             List<CommonFile> cfFileList = filesService.getFilesList(AppConstants.TABLES[i]);
+
+           // System.out.println(cfFileList);
 
             if (cfFileList.size() > 0) {
 
