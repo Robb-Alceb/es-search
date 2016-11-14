@@ -105,8 +105,8 @@ public class QueryServiceImpl implements QueryService {
 
         QueryBuilder filterType  = boolQuery().must(termsQuery(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), allType));
 
-        if (param.getDocTypoe() != null) {
-            filterType = boolQuery().must(termsQuery(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), param.getDocTypoe()));
+        if (param.getDocType() != null) {
+            filterType = boolQuery().must(termsQuery(SearchDocumentFieldName.FILE_EXT_NAME.getFieldName(), param.getDocType()));
         }
 
         // QueryBuilder filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);

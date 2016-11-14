@@ -18,18 +18,18 @@ public class SearchParam  implements Serializable {
     private int limit;
     private String fileCategory;
     private String groupId;
-    private String docTypoe;
+    private String docType;
 
 
     public SearchParam() {
     }
 
-    public String getDocTypoe() {
-        return docTypoe;
+    public String getDocType() {
+        return docType;
     }
 
-    public void setDocTypoe(String docTypoe) {
-        this.docTypoe = docTypoe;
+    public void setDocType(String docType) {
+        this.docType = docType;
     }
 
     public Long getUserId() {
