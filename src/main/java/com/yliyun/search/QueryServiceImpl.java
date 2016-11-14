@@ -17,6 +17,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryParser;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -70,8 +71,10 @@ public class QueryServiceImpl implements QueryService {
 
         Object[] joinGroups = gids.toArray();
 
+        String parserKeyword = org.apache.lucene.queryparser.classic.QueryParser.escape(param.getKeyword());
+
         // 全文搜索字段
-        QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(param.getKeyword()).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
+        QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(parserKeyword).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
                 .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 0.8f)
                 .analyzer(ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
@@ -156,8 +159,8 @@ public class QueryServiceImpl implements QueryService {
             Map<String, Object> rsMap = searchHit.getSource();
 
             Map<String, HighlightField> result = searchHit.highlightFields();
-            // System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_TITLE.getFieldName()));
-            //  System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()));
+             System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()));
+//            System.out.println("===========高亮============="+result.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()).getFragments());
             CommonFile cf = searchRsToCom(rsMap, result);
 
             list.add(cf);

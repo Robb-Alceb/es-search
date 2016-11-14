@@ -5,11 +5,14 @@ import com.yliyun.index.SetupIndexService;
 import com.yliyun.search.QueryService;
 import com.yliyun.search.SearchResult;
 import com.yliyun.util.AppConfig;
+import com.yliyun.util.AppConstants;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -39,9 +42,9 @@ public class StartCtrl {
     }
 
     @RequestMapping(value = "/fsearch", method = RequestMethod.POST)
-    public SearchResult search(@RequestBody SearchParam param ) {
+    public SearchResult search(@RequestBody SearchParam param) {
 
-        System.out.println("param:"+param.toString());
+        System.out.println("param:" + param.toString());
 
         return queryService.baseSearch(param);
     }
@@ -49,6 +52,11 @@ public class StartCtrl {
 
     @RequestMapping("/setup")
     public String setup() {
+
+        File dic = new File(AppConstants.DOWNLOAD_ADDR);
+        if (!dic.exists()) {
+            dic.mkdir();
+        }
 
         if (setupIndexService.isIndexExists(ac.getIndexName())) {
             return "setuped";

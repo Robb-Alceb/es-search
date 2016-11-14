@@ -4,6 +4,7 @@ package com.yliyun.util;/**
 
 import com.yliyun.model.CommonFile;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,15 @@ public class AppConstants {
         String[] typeArr = {"other", "pic", "doc", "audio", "video", "app", "zip"};
 
         return typeArr[Integer.parseInt(number)];
+    }
+
+    public static String getFileExt(String name) {
+        int flag = name.lastIndexOf(".");
+        if (flag > 0) {
+            return name.substring(flag + 1);
+        } else {
+            return "**";
+        }
     }
 
 

@@ -53,12 +53,16 @@ public class FileServiceImpl implements FilesService {
     private RestTemplate restTemplate;
 
 
-    public void download(String url, String fileName) throws IOException {
+    public void download(String url, String fileName)  {
 
         System.out.println("----------download-------, " + url);
 
         byte[] fileByte = restTemplate.getForObject("http://" + url, byte[].class);
-        Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
+        try {
+            Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         LOGGER.info("FileServiceImpl > download  success !! ", "download/" + fileName);
     }

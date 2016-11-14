@@ -3,7 +3,6 @@ package com.yliyun.util;/**
  */
 
 import org.apache.cxf.common.i18n.Exception;
-import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -24,12 +23,15 @@ import java.io.*;
 public class TikaUtils {
 
 
-    public static String txtParser(String path) throws IOException, TikaException, SAXException {
+
+
+    public static String txtParser(File path) throws IOException, TikaException, SAXException {
 
         BodyContentHandler handler = new BodyContentHandler(1000 * 1024 * 1024);
         Metadata metadata = new Metadata();
 
-        FileInputStream inputstream = new FileInputStream(new File(path));
+        FileInputStream inputstream = new FileInputStream(path);
+
 
         ParseContext pcontext = new ParseContext();
 
@@ -73,6 +75,7 @@ public class TikaUtils {
         if (is != null) is.close();
         return handler.toString();
     }
+
 
 
 }

@@ -34,7 +34,7 @@ public class TikaTest {
     public void getTxtFile() throws TikaException, IOException, SAXException {
         TikaUtils tu = new TikaUtils();
 
-        tu.txtParser("D:\\work\\_kuaisofa\\commons.css");
+        //tu.txtParser("D:\\work\\_kuaisofa\\commons.css");
 
 
 

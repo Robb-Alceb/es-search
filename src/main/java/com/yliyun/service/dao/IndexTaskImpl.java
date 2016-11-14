@@ -180,17 +180,9 @@ public class IndexTaskImpl implements IndexTask {
 
         String storeAddr = AppConstants.DOWNLOAD_ADDR + cf.getFile_name();
 
-       // log.info("storeAddr---------------------------------> : ",storeAddr);
-
         String storePath = filesService.getDownloadUrl(cf.getFs_file_id());
 
-      //  log.info("-----------------storePath----------------> : ",storePath);
-
         String url = ac.getDownloadUrl() + storePath;
-
-
-       // log.info("------------download-----url----------------> : ",url);
-
 
         filesService.download(url, cf.getFile_name());
 
@@ -198,7 +190,16 @@ public class IndexTaskImpl implements IndexTask {
 
         log.info("get file content start --------------------: ", indexFile.getName());
 
-        String txt = TikaUtils.fileToTxt(indexFile);
+        String ext = AppConstants.getFileExt(cf.getFile_name());
+
+        String txt = null;
+
+        if(ext.equals("txt")||ext.equals("**")||ext.equals("md")){
+            txt = TikaUtils.txtParser(indexFile);
+        }else{
+            txt = TikaUtils.fileToTxt(indexFile);
+        }
+
 
         log.info("get file content end ------------------ : ", txt);
 
