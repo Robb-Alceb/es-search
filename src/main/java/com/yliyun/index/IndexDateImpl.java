@@ -44,11 +44,13 @@ public class IndexDateImpl implements IndexDataService {
     public boolean indexData(CommonFile doc) {
 
         try {
+
+            // index content
             IndexResponse ir = getIndexRequestBuilderForAProduct(doc).get();
 
             // System.out.println( ir.getContext().toString());
 
-            logger.info("IndexDateImpl  --->  indexData ---> result : ", ir.getContext());
+            //logger.info("IndexDateImpl  --->  indexData ---> result : ", ir.getContext());
 
            // ac.close();
 
@@ -86,6 +88,13 @@ public class IndexDateImpl implements IndexDataService {
 
     }
 
+    /***
+     * 在对应的映射规则中插入数据
+     * @param doc
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
     private XContentBuilder getXContentBuilderForAProduct(CommonFile doc) throws IOException, ParseException {
 
         XContentBuilder contentBuilder = null;
@@ -110,6 +119,7 @@ public class IndexDateImpl implements IndexDataService {
                     .field(SearchDocumentFieldName.FILE_SIZE.getFieldName(), doc.getFile_size())
 
                     .field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), doc.getFile_name())
+                    .field(SearchDocumentFieldName.FILE_ALL_NAME.getFieldName(), doc.getFile_name())
                     .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), doc.getFile_contents())
 
 

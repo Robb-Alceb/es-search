@@ -73,12 +73,16 @@ public class QueryServiceImpl implements QueryService {
 
         String parserKeyword = org.apache.lucene.queryparser.classic.QueryParser.escape(param.getKeyword());
 
-        // 全文搜索字段
+        // 全文搜索字段,在名字和内容中搜索，包含分词
         QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(parserKeyword).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
-                .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 0.8f)
+                .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 1.2f)
                 .analyzer(ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
 
+        // 部分匹配，只在文件名匹配
+        QueryBuilder wildcard =   boolQuery().should(wildcardQuery(SearchDocumentFieldName.FILE_ALL_NAME.getFieldName(),"*"+parserKeyword+"*").boost(1.8f));
+
+        QueryBuilder globQ = boolQuery().should(qqb).should(wildcard);
 
         // 个人文件过滤字段
         QueryBuilder filterPersonal = boolQuery().must(termQuery(SearchDocumentFieldName.FILE_USER_ID.getFieldName(), param.getUserId()));
@@ -112,7 +116,7 @@ public class QueryServiceImpl implements QueryService {
         // QueryBuilder filterAll = boolQuery().should(filterPersonal).should(filterGroup).should(filterPub);
 
         QueryBuilder tqb = boolQuery()
-                .must(qqb)
+                .must(globQ)
                 .must(filterAll)
                 .must(filterType)
                 .must(boolQuery().must(termQuery(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0)));

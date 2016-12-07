@@ -16,6 +16,7 @@ public enum SearchDocumentFieldName
 
     FILE_PARENT_ID("parent_id"),
     FS_FILE_ID("fs_file_id"),
+    FILE_ALL_NAME("file_all_name"),
 
 
     // 全文分析
@@ -82,6 +83,8 @@ public enum SearchDocumentFieldName
     public static final String[] allStoreTextDocumentFields = {
 
             FILE_ID.getFieldName(),
+
+            FILE_ALL_NAME.getFieldName(),
 
             FILE_USER_ID.getFieldName(),
             FILE_GROUP_ID.getFieldName(),

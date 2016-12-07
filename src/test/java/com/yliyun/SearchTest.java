@@ -41,7 +41,7 @@ public class SearchTest {
         SearchParam sp = new SearchParam();
         sp.setLimit(20);
         sp.setOffset(0);
-        sp.setKeyword("文件");
+        sp.setKeyword("bug");
         sp.setUserId(99l);
        // sp.setDocTypoe("2");
         //sp.setFileCategory(AppConstants.FC_PUBLIC);
