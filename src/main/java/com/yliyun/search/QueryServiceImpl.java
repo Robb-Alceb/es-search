@@ -74,7 +74,7 @@ public class QueryServiceImpl implements QueryService {
         String parserKeyword = org.apache.lucene.queryparser.classic.QueryParser.escape(param.getKeyword());
 
         // 全文搜索字段,在名字和内容中搜索，包含分词
-        QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(parserKeyword).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 2.0f)
+        QueryStringQueryBuilder qqb = new QueryStringQueryBuilder(parserKeyword).field(SearchDocumentFieldName.FILE_TITLE.getFieldName(), 1.1f)
                 .field(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), 1.2f)
                 .analyzer(ElasticSearchReservedWords.ANALYZER_IK_MAX.getText())
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
