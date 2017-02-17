@@ -57,6 +57,10 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public SearchResult baseSearch(SearchParam param) {
 
+        if(param.getKeyword() == null || "".equals(param.getKeyword())){
+            return  null;
+        }
+
         List<Group_member> gml = filesService.getGroupList(param.getUserId() + "");
 
         List<String> gids = new ArrayList<String>();

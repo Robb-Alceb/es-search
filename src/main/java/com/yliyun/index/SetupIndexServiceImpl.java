@@ -37,6 +37,8 @@ public class SetupIndexServiceImpl implements SetupIndexService {
     @Override
     public boolean isIndexExists(String indexName) {
 
+        LOGGER.info("SetupIndexServiceImpl ac ", ac, ac.getClient());
+
         ListenableActionFuture<IndicesExistsResponse> ll = ac.getClient().admin().indices().prepareExists(indexName).execute();
 
         try {
@@ -84,6 +86,8 @@ public class SetupIndexServiceImpl implements SetupIndexService {
         CreateIndexRequest cir = new CreateIndexRequest(ac.getIndexName(), settings);
 
         try {
+            LOGGER.info("SetupIndexServiceImpl --->  ac.getClient", ac.getClient());
+
             CreateIndexResponse cis = ac.getClient().admin().indices().create(cir).actionGet();
             LOGGER.info("SetupIndexServiceImpl --->  createIndex -----> result : ", cis.getContext().toString());
           //  ac.close();

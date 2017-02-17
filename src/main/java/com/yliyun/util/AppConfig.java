@@ -24,6 +24,9 @@ import java.util.Map;
 @Configuration
 public class AppConfig {
 
+
+    private TransportClient client = null;
+
     @Value("${app.download.host}")
     private String downloadUrl;
 
@@ -51,7 +54,7 @@ public class AppConfig {
         this.dbPage = dbPage;
     }
 
-    public  String  getEsHost() {
+    public String getEsHost() {
         return esHost;
     }
 
@@ -83,37 +86,27 @@ public class AppConfig {
         this.typeName = typeName;
     }
 
-    public TransportClient getClient(){
-        return EsClient.getTransportClient();
+//    public TransportClient getClient(){
+//        return EsClient.getTransportClient();
+//    }
+
+
+    public synchronized TransportClient getClient() {
+
+        if (client == null) {
+            Map<String, String> m = new HashMap<String, String>();
+            m.put("cluster.name", "yliyun-es");
+            Settings settings = Settings.settingsBuilder().put(m).put("number_of_shards", 2).put("number_of_replicas", "0").put("client.transport.sniff", true).build();
+
+            try {
+                client = TransportClient.builder().settings(settings).build()
+                        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(getEsHost()), 9300));
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        return client;
+
     }
-
-
-//    public TransportClient getClient() {
-//
-//        if (this.client != null) {
-//            return client;
-//        }
-//        try {
-//            Settings settings = Settings.settingsBuilder().put("cluster.name", "yliyun-es")
-//                    .build();
-//            client = TransportClient.builder().settings(settings).build()
-//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.getEsHost()), 9300));
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return client;
-//
-//    }
-
-//    public  void close(){
-//
-//        client.close();
-//    }
-
-
-
-
-
 
 }

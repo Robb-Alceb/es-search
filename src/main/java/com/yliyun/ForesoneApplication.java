@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 
 @EnableScheduling
 @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
-public class ForesoneApplication {
+public class ForesoneApplication extends SpringBootServletInitializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ForesoneApplication.class);
 
@@ -47,4 +49,11 @@ public class ForesoneApplication {
 		//System.exit(0);
 
 	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(ForesoneApplication.class);
+	}
+
+
 }
