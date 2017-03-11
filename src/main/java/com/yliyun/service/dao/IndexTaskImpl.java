@@ -180,6 +180,8 @@ public class IndexTaskImpl implements IndexTask {
 
         String storeAddr = AppConstants.DOWNLOAD_ADDR + cf.getFile_name();
 
+        log.warn("get file content start --------------------: ", storeAddr);
+
         String storePath = filesService.getDownloadUrl(cf.getFs_file_id());
 
         String url = ac.getDownloadUrl() + storePath;
@@ -188,7 +190,7 @@ public class IndexTaskImpl implements IndexTask {
 
         File indexFile = new File(storeAddr);
 
-        log.info("get file content start --------------------: ", indexFile.getName());
+        log.warn("get file content start --------------------: ", indexFile.getName());
 
         String ext = AppConstants.getFileExt(cf.getFile_name());
 

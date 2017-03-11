@@ -30,15 +30,15 @@ public class MysqlConfig {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "secondaryDataSource")
-    @Qualifier("secondaryDataSource")
+//    @Bean(name = "secondaryDataSource")
+//    @Qualifier("secondaryDataSource")
 
 
-    @Primary
-    @ConfigurationProperties(prefix="spring.datasource.secondary")
-    public DataSource secondaryDataSource() {
-        return DataSourceBuilder.create().build();
-    }
+//    @Primary
+//    @ConfigurationProperties(prefix="spring.datasource.secondary")
+//    public DataSource secondaryDataSource() {
+//        return DataSourceBuilder.create().build();
+//    }
 
     @Bean(name = "primaryJdbcTemplate")
     public JdbcTemplate primaryJdbcTemplate(
@@ -46,10 +46,10 @@ public class MysqlConfig {
         return new JdbcTemplate(dataSource);
     }
 
-    @Bean(name = "secondaryJdbcTemplate")
-    public JdbcTemplate secondaryJdbcTemplate(
-            @Qualifier("secondaryDataSource") DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
+//    @Bean(name = "secondaryJdbcTemplate")
+//    public JdbcTemplate secondaryJdbcTemplate(
+//            @Qualifier("secondaryDataSource") DataSource dataSource) {
+//        return new JdbcTemplate(dataSource);
+//    }
 
 }

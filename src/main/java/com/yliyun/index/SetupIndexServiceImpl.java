@@ -1,9 +1,6 @@
 package com.yliyun.index;
 
 import com.yliyun.util.AppConfig;
-import com.yliyun.util.EsClient;
-import com.yliyun.util.TikaUtils;
-import org.apache.tika.Tika;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
