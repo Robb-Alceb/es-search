@@ -52,6 +52,9 @@ public class ForesoneApplication extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+
+		// todo 创建索引资源
+
 		return application.sources(ForesoneApplication.class);
 	}
 
