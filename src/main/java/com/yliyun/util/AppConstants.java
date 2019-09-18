@@ -40,6 +40,8 @@ public class AppConstants {
     public static String D_ST_UP = "statusUp";
 
     public static String DOWNLOAD_ADDR = "download/";
+    public static String CONFIG_OUTER_ADDR = "config/application.properties";
+
 
     public static String[] docs = {"ppt", "pptx", "doc", "docx", "wps", "pps", "pptm", "xls",
             "xlsx", "xlt", "xltm", "xlsm", "xlts", "xlw", "vsd", "vsdx", "dot", "pdf", "rtf", "dwg", "dxf", "html", "htm"

@@ -96,7 +96,7 @@ public class AppConfig {
         if (client == null) {
             Map<String, String> m = new HashMap<String, String>();
             m.put("cluster.name", "yliyun-es");
-            Settings settings = Settings.settingsBuilder().put(m).put("number_of_shards", 2).put("number_of_replicas", "0").put("client.transport.sniff", true).build();
+            Settings settings = Settings.settingsBuilder().put(m).put("number_of_shards", 2).put("number_of_replicas", "0").put("client.transport.sniff", false).build();
 
             try {
                 client = TransportClient.builder().settings(settings).build()

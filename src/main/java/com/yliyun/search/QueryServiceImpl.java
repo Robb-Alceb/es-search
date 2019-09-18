@@ -219,7 +219,7 @@ public class QueryServiceImpl implements QueryService {
         }
 
         if (rsMap.get(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName()) != null) {
-            cf.setUpdate_time(rsMap.get(SearchDocumentFieldName.FILE_UPDATE_TIME)+"");
+            cf.setUpdate_time(rsMap.get(SearchDocumentFieldName.FILE_UPDATE_TIME.getFieldName())+"");
         }
         if (rsMap.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName()) != null) {
             cf.setFile_contents(hmap.get(SearchDocumentFieldName.FILE_CONTENTS.getFieldName())+"");

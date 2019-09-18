@@ -11,10 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -52,15 +54,27 @@ public class FileServiceImpl implements FilesService {
     @Autowired
     private RestTemplate restTemplate;
 
+    /**
+     * 这两个参数是为了从fsfs下载文件时防盗链检查报错，固定为0
+     */
+    @Value("${app.download.token}")
+    private String token;
+    @Value("${app.download.ts}")
+    private String ts;
+
 
     public void download(String url, String fileName)  {
 
         System.out.println("----------download-------, " + url);
 
+        //这两个参数是为了从fsfs下载文件时防盗链检查报错，固定为0
+        url += "?token="+token+"&ts="+ts;
         byte[] fileByte = restTemplate.getForObject("http://" + url, byte[].class);
         try {
+            LOGGER.info("FileServiceImpl > file path is !!"+Paths.get(AppConstants.DOWNLOAD_ADDR + fileName).toAbsolutePath().toAbsolutePath().toString());
             Files.write(Paths.get(AppConstants.DOWNLOAD_ADDR + fileName), fileByte);
         } catch (IOException e) {
+            LOGGER.info("FileServiceImpl > error  ", "download/" + AppConstants.DOWNLOAD_ADDR + fileName);
             e.printStackTrace();
         }
 

@@ -74,9 +74,9 @@ public class IndexTaskImpl implements IndexTask {
                 log.info(">>>>>>>-----StatusUp---->>>>>>>>>>>  is  update file : ");
 
                 if (cf.getDel_status() == 0) {
-                    updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0, cf.getFile_id());
+                    updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 0, cf.getFs_file_id());
                 } else {
-                    updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 1, cf.getFile_id());
+                    updateDocStatus(SearchDocumentFieldName.FILE_STATUS.getFieldName(), 1, cf.getFs_file_id());
                 }
                 filesService.updateFileStatus(cf, 1);
                 return; // 跳出执行
@@ -86,7 +86,7 @@ public class IndexTaskImpl implements IndexTask {
                 log.info(">>>>>>>-----Content-Up---->>>>>>>>>>>  is  update file : ");
                 try {
                     getContents(cf);
-                    updateDocStatus(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), cf.getFile_contents(), cf.getFile_id());
+                    updateDocStatus(SearchDocumentFieldName.FILE_CONTENTS.getFieldName(), cf.getFile_contents(), cf.getFs_file_id());
                     filesService.updateFileStatus(cf, 1);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -98,7 +98,7 @@ public class IndexTaskImpl implements IndexTask {
             // 更新文件名
             if (upds.getReName()) {
                 log.info(">>>>>>>-----reName-Up---->>>>>>>>>>>  is  update file : ");
-                updateDocStatus(SearchDocumentFieldName.FILE_TITLE.getFieldName(), cf.getFile_name(), cf.getFile_id());
+                updateDocStatus(SearchDocumentFieldName.FILE_TITLE.getFieldName(), cf.getFile_name(), cf.getFs_file_id());
                 filesService.updateFileStatus(cf, 1);
                 return;
             }

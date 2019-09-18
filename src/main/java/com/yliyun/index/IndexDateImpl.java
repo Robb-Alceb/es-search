@@ -80,7 +80,7 @@ public class IndexDateImpl implements IndexDataService {
             e.printStackTrace();
         }
 
-        IndexRequestBuilder indexRequestBuilder = ac.getClient().prepareIndex(ac.getIndexName(), ac.getTypeName(), String.valueOf(doc.getFile_id()));
+        IndexRequestBuilder indexRequestBuilder = ac.getClient().prepareIndex(ac.getIndexName(), ac.getTypeName(), String.valueOf(doc.getFs_file_id()));
 
         indexRequestBuilder.setSource(contentBuilder);
 
